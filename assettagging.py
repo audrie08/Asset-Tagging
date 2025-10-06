@@ -105,7 +105,7 @@ if credentials:
         station_column = df.columns[0]
         
         # Define stations
-        stations = ['hot', 'fabrication', 'pastry', 'packing']
+        stations = ['hot station', 'fabrication station', 'pastry station', 'packing station']
         
         # Create tabs for each station
         st.subheader("🏭 Station Data")
