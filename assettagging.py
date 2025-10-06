@@ -4,18 +4,148 @@ import gspread
 from google.oauth2.service_account import Credentials
 import warnings
 import io
-import streamlit.components.v1 as components
 
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="Asset Tagging", layout="wide")
 
-# Hide default Streamlit elements
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .block-container {padding-top: 2rem;}
-    [data-testid="column"] {padding: 0 6px;}
+    .block-container {padding: 2rem 3rem;}
+    [data-testid="column"] {padding: 0 8px;}
+    
+    /* Header styling */
+    .header-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.25rem;
+    }
+    .header-subtitle {
+        font-size: 14px;
+        color: #999;
+        margin-bottom: 2rem;
+    }
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0;
+        background: transparent;
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 2rem;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 48px;
+        padding: 0 20px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #666;
+        border: none;
+        background: transparent;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #1a1a1a;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #1a1a1a;
+        border-bottom-color: #1a1a1a;
+        background: transparent;
+    }
+    
+    /* Metrics */
+    [data-testid="stMetric"] {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 8px;
+        border: 1px solid #f0f0f0;
+    }
+    [data-testid="stMetricValue"] {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 13px;
+        font-weight: 500;
+        color: #666;
+    }
+    
+    /* Input fields */
+    .stTextInput > div > div > input {
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+    .stTextInput > div > div > input:focus {
+        border-color: #999;
+        box-shadow: none;
+    }
+    .stSelectbox > div > div {
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    /* Buttons - make them look like cards */
+    .stButton > button {
+        background: white !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 1.25rem !important;
+        text-align: left !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        color: #1a1a1a !important;
+        transition: all 0.2s ease !important;
+        height: auto !important;
+        min-height: 120px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    }
+    .stButton > button:hover {
+        border-color: #999 !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    /* Download button */
+    .stDownloadButton > button {
+        background: #1a1a1a !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 10px 20px !important;
+        font-weight: 500 !important;
+        border: none !important;
+        font-size: 14px !important;
+    }
+    .stDownloadButton > button:hover {
+        background: #333 !important;
+    }
+    
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        background: white !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 14px 18px !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+        margin-bottom: 12px !important;
+    }
+    .streamlit-expanderHeader:hover {
+        border-color: #999 !important;
+    }
+    [data-testid="stExpander"] {
+        border: none !important;
+    }
+    .streamlit-expanderContent {
+        background: #fafafa !important;
+        border: none !important;
+        border-radius: 0 0 8px 8px !important;
+        padding: 18px !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -87,116 +217,18 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
-def generate_asset_cards_html(grouped_df, asset_name_col, df_columns):
-    """Generate custom HTML for asset cards"""
-    grouped = grouped_df.groupby(asset_name_col)
-    
-    cards_html = ""
-    for asset_name, group_df in grouped:
-        count = len(group_df)
-        asset_codes = group_df[df_columns[0]].tolist()[:3]
-        
-        cards_html += f"""
-        <div class="asset-card">
-            <div class="asset-card-header">
-                <div class="asset-name">{asset_name}</div>
-                <div class="asset-count">{count} items</div>
-            </div>
-        </div>
-        """
-    
-    full_html = f"""
-    <style>
-        .asset-grid {{
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            margin-top: 20px;
-        }}
-        
-        .asset-card {{
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }}
-        
-        .asset-card::before {{
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }}
-        
-        .asset-card:hover {{
-            border-color: #667eea;
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.15);
-        }}
-        
-        .asset-card:hover::before {{
-            transform: scaleX(1);
-        }}
-        
-        .asset-card-header {{
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }}
-        
-        .asset-name {{
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a1a;
-            letter-spacing: -0.01em;
-        }}
-        
-        .asset-count {{
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
-        }}
-        
-        @media (max-width: 1400px) {{
-            .asset-grid {{
-                grid-template-columns: repeat(4, 1fr);
-            }}
-        }}
-        
-        @media (max-width: 1000px) {{
-            .asset-grid {{
-                grid-template-columns: repeat(3, 1fr);
-            }}
-        }}
-    </style>
-    
-    <div class="asset-grid">
-        {cards_html}
-    </div>
-    """
-    
-    return full_html
+def get_avatar_color(name):
+    """Generate consistent color for avatar based on name"""
+    colors = [
+        "#8B5CF6", "#6366F1", "#3B82F6", "#06B6D4", 
+        "#10B981", "#F59E0B", "#EF4444", "#EC4899"
+    ]
+    index = sum(ord(c) for c in name) % len(colors)
+    return colors[index]
 
 # Main App
-st.markdown("""
-<div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem; letter-spacing: -0.02em;">
-        Asset Tagging System
-    </h1>
-    <p style="color: #666; font-size: 16px; margin: 0;">
-        Manage and track all commissary assets
-    </p>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
 
@@ -212,37 +244,7 @@ if credentials:
         station_col = df.columns[1]
         asset_name_col = df.columns[3]
         
-        # Statistics with custom styling
-        st.markdown("""
-        <style>
-            [data-testid="stMetric"] {
-                background: white;
-                padding: 1.5rem;
-                border-radius: 12px;
-                border: 2px solid #f0f0f0;
-                transition: all 0.3s ease;
-            }
-            [data-testid="stMetric"]:hover {
-                border-color: #667eea;
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-            }
-            [data-testid="stMetricValue"] {
-                font-size: 36px;
-                font-weight: 700;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-            [data-testid="stMetricLabel"] {
-                font-size: 14px;
-                font-weight: 600;
-                color: #666;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }
-        </style>
-        """, unsafe_allow_html=True)
-        
+        # Statistics
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Total Assets", len(df))
@@ -252,71 +254,6 @@ if credentials:
         with col3:
             not_working = len(df[df[df.columns[11]].str.contains("Not Working", case=False, na=False)])
             st.metric("Not Working", not_working)
-        
-        st.markdown("<div style='margin: 2rem 0; height: 1px; background: #e0e0e0;'></div>", unsafe_allow_html=True)
-        
-        # Custom tabs styling
-        st.markdown("""
-        <style>
-            .stTabs [data-baseweb="tab-list"] {
-                gap: 8px;
-                background: white;
-                padding: 8px;
-                border-radius: 12px;
-                border: 2px solid #f0f0f0;
-            }
-            .stTabs [data-baseweb="tab"] {
-                height: 48px;
-                border-radius: 8px;
-                padding: 0 24px;
-                font-weight: 600;
-                font-size: 14px;
-                border: none;
-                color: #666;
-                transition: all 0.2s ease;
-            }
-            .stTabs [data-baseweb="tab"]:hover {
-                background: #f5f5f5;
-                color: #1a1a1a;
-            }
-            .stTabs [aria-selected="true"] {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white !important;
-            }
-            
-            /* Input styling */
-            .stTextInput > div > div > input {
-                border-radius: 10px;
-                border: 2px solid #e0e0e0;
-                padding: 12px 16px;
-                font-size: 14px;
-                transition: all 0.2s ease;
-            }
-            .stTextInput > div > div > input:focus {
-                border-color: #667eea;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            }
-            .stSelectbox > div > div {
-                border-radius: 10px;
-                border: 2px solid #e0e0e0;
-            }
-            
-            /* Download button */
-            .stDownloadButton > button {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border-radius: 10px;
-                padding: 12px 24px;
-                font-weight: 600;
-                border: none;
-                transition: all 0.3s ease;
-            }
-            .stDownloadButton > button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-            }
-        </style>
-        """, unsafe_allow_html=True)
         
         stations = {
             'Hot Station': 'Hot Station',
@@ -337,87 +274,45 @@ if credentials:
                     # Check if modal is open
                     if f'modal_{station_key}' in st.session_state:
                         # Modal view
-                        st.markdown(f"""
-                        <div style="margin-bottom: 2rem;">
-                            <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">
-                                {st.session_state[f'modal_{station_key}']} 
-                                <span style="color: #666; font-weight: 500;">
-                                    ({len(st.session_state[f'modal_data_{station_key}'])} items)
-                                </span>
-                            </h2>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        st.markdown(f'<div style="font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 1rem;">{st.session_state[f"modal_{station_key}"]} <span style="color: #999; font-weight: 400;">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
-                        if st.button("← Back to Assets", key=f"close_{station_key}"):
+                        if st.button("← Back", key=f"close_{station_key}"):
                             del st.session_state[f'modal_{station_key}']
                             del st.session_state[f'modal_data_{station_key}']
                             st.rerun()
                         
-                        st.markdown("<div style='margin: 1.5rem 0; height: 1px; background: #e0e0e0;'></div>", unsafe_allow_html=True)
-                        
-                        # Display asset items with improved styling
-                        st.markdown("""
-                        <style>
-                            .streamlit-expanderHeader {
-                                background: white !important;
-                                border: 2px solid #e0e0e0 !important;
-                                border-radius: 10px !important;
-                                padding: 16px 20px !important;
-                                font-weight: 600 !important;
-                                font-size: 14px !important;
-                                transition: all 0.2s ease !important;
-                                margin-bottom: 12px !important;
-                            }
-                            .streamlit-expanderHeader:hover {
-                                border-color: #667eea !important;
-                                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1) !important;
-                            }
-                            [data-testid="stExpander"] {
-                                border: none !important;
-                            }
-                            .streamlit-expanderContent {
-                                background: #fafafa !important;
-                                border: none !important;
-                                border-radius: 0 0 10px 10px !important;
-                                padding: 20px !important;
-                            }
-                        </style>
-                        """, unsafe_allow_html=True)
+                        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
                         for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
                             asset_number = row.get(df.columns[0], 'N/A')
                             
-                            with st.expander(f"{asset_number}"):
+                            with st.expander(asset_number):
                                 col1, col2, col3 = st.columns(3)
                                 
                                 with col1:
-                                    st.markdown("**TYPE**")
+                                    st.markdown("**Type**")
                                     st.write(row.get(df.columns[2], "N/A"))
-                                    st.markdown("**QUANTITY**")
+                                    st.markdown("**Quantity**")
                                     st.write(row.get(df.columns[4], "N/A"))
                                     
                                 with col2:
-                                    st.markdown("**DIMENSIONS**")
+                                    st.markdown("**Dimensions**")
                                     dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
                                     st.write(dims)
-                                    st.markdown("**VOLTAGE**")
+                                    st.markdown("**Voltage**")
                                     st.write(row.get(df.columns[9], "N/A"))
                                     
                                 with col3:
-                                    st.markdown("**POWER**")
+                                    st.markdown("**Power**")
                                     st.write(row.get(df.columns[10], "N/A"))
-                                    st.markdown("**STATUS**")
-                                    status = row.get(df.columns[11], "N/A")
-                                    if "Working" in status:
-                                        st.success(status)
-                                    else:
-                                        st.error(status)
+                                    st.markdown("**Status**")
+                                    st.write(row.get(df.columns[11], "N/A"))
                     else:
                         # Card grid view
                         col_search, col_filter = st.columns([2, 1])
                         
                         with col_search:
-                            search_term = st.text_input("Search assets", placeholder="Type to search...", key=f"search_{station_value}", label_visibility="collapsed")
+                            search_term = st.text_input("Search", placeholder="Search assets...", key=f"search_{station_value}", label_visibility="collapsed")
                         
                         with col_filter:
                             asset_names = ['All'] + sorted(station_df[asset_name_col].unique().tolist())
@@ -432,23 +327,42 @@ if credentials:
                             mask = filtered[asset_name_col].str.contains(search_term, case=False, na=False)
                             filtered = filtered[mask]
                         
-                        st.markdown(f"<p style='color: #666; font-size: 14px; margin: 1rem 0;'>Showing {len(filtered)} of {len(station_df)} assets</p>", unsafe_allow_html=True)
+                        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
                         if not filtered.empty:
-                            # Display as clickable cards using custom HTML and buttons
                             grouped = filtered.groupby(asset_name_col)
                             asset_groups = list(grouped)
                             
-                            num_cols = 5
+                            num_cols = 4
                             for i in range(0, len(asset_groups), num_cols):
                                 cols = st.columns(num_cols)
                                 batch = asset_groups[i:i + num_cols]
                                 
                                 for col_idx, (asset_name, group_df) in enumerate(batch):
                                     with cols[col_idx]:
-                                        # Custom styled button
+                                        initial = asset_name[0].upper()
+                                        color = get_avatar_color(asset_name)
+                                        count = len(group_df)
+                                        
+                                        # Create card-like button with avatar and info
+                                        button_html = f"""
+                                        <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                            <div style="width: 40px; height: 40px; border-radius: 50%; background: {color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px; flex-shrink: 0;">
+                                                {initial}
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <div style="font-weight: 600; font-size: 14px; color: #1a1a1a; margin-bottom: 8px; line-height: 1.4;">
+                                                    {asset_name}
+                                                </div>
+                                                <div style="font-size: 12px; color: #666; display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
+                                                    <span>📦</span> {count} items
+                                                </div>
+                                            </div>
+                                        </div>
+                                        """
+                                        
                                         if st.button(
-                                            f"{asset_name}\n\n{len(group_df)} items",
+                                            button_html,
                                             key=f"{station_key}_{asset_name}",
                                             use_container_width=True
                                         ):
@@ -456,10 +370,10 @@ if credentials:
                                             st.session_state[f'modal_data_{station_key}'] = group_df
                                             st.rerun()
                         else:
-                            st.info("No assets found matching your filters.")
+                            st.info("No assets found")
                     
                     # Download button
-                    st.markdown("<div style='margin: 2rem 0; height: 1px; background: #e0e0e0;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
                     csv = station_df.to_csv(index=False)
                     st.download_button(
                         label=f"Download {tab_name} Data",
