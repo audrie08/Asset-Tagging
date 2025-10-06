@@ -40,22 +40,44 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         if not data:
             return pd.DataFrame()
         
-        df = pd.DataFrame(data[1:], columns=data[0])
+        # Get headers and make them unique
+        headers = data[0]
+        unique_headers = []
+        header_counts = {}
+        
+        for header in headers:
+            # Handle empty headers
+            if not header or header.strip() == '':
+                header = 'Unnamed'
+            
+            # Make duplicate headers unique
+            if header in header_counts:
+                header_counts[header] += 1
+                unique_headers.append(f"{header}_{header_counts[header]}")
+            else:
+                header_counts[header] = 0
+                unique_headers.append(header)
+        
+        # Create dataframe with unique headers
+        df = pd.DataFrame(data[1:], columns=unique_headers)
+        
+        # Remove completely empty columns
+        df = df.loc[:, (df != '').any(axis=0)]
+        
         return df
     except Exception as e:
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
 # Main App
-st.title("Asset Tagging")
+st.title("📊 Google Sheets Data Viewer")
 
 # Load credentials
 credentials = load_credentials()
 
 if credentials:
     # Input for Google Sheet URL
-    sheet_url = sheet_url = "https://docs.google.com/spreadsheets/d/10GM76b6Y91ZfNelelaOvgXSLbqaPKHwfgMWN0x9Y42c"
-
+    sheet_url = "https://docs.google.com/spreadsheets/d/10GM76b6Y91ZfNelelaOvgXSLbqaPKHwfgMWN0x9Y42c"
     
     if sheet_url:
         # Load data from sheet index 0
