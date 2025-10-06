@@ -93,6 +93,24 @@ st.markdown("""
         border-radius: 8px;
         padding: 10px 20px;
     }
+    
+    /* Make expanders wider */
+    .stExpander {
+        width: 100%;
+    }
+    
+    details {
+        width: 100%;
+    }
+    
+    .streamlit-expanderHeader {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    .streamlit-expanderContent {
+        padding: 1rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -264,8 +282,8 @@ if credentials:
                         grouped = filtered.groupby(asset_name_col)
                         asset_groups = list(grouped)
                         
-                        # Display in 4 columns
-                        num_cols = 4
+                        # Display in 5 columns
+                        num_cols = 5
                         for i in range(0, len(asset_groups), num_cols):
                             cols = st.columns(num_cols)
                             
