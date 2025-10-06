@@ -70,7 +70,7 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 # Main App
-st.title("📊 Google Sheets Data Viewer")
+st.title("Asset Tagging")
 
 # Load credentials
 credentials = load_credentials()
