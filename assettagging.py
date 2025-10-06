@@ -114,7 +114,7 @@ if credentials:
             )
             
             # Define stations
-            stations = ['hot kitchen', 'fabrication', 'pastry', 'packing']
+            stations = ['hot', 'fabrication', 'pastry', 'packing']
             
             # Create tabs for each station
             st.subheader("🏭 Station Data")
