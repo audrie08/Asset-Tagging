@@ -37,20 +37,35 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         worksheet = spreadsheet.get_worksheet(sheet_index)
         data = worksheet.get_all_values()
         
-        if not data:
+        if not data or len(data) < 4:
             return pd.DataFrame()
         
-        # Get headers and make them unique
-        headers = data[0]
+        # Combine rows 2 and 3 (index 1 and 2) to create headers
+        row1_headers = data[1]
+        row2_headers = data[2]
+        
+        combined_headers = []
+        for i in range(len(row1_headers)):
+            header1 = row1_headers[i].strip() if i < len(row1_headers) else ''
+            header2 = row2_headers[i].strip() if i < len(row2_headers) else ''
+            
+            # Combine the two rows
+            if header1 and header2:
+                combined = f"{header1} {header2}"
+            elif header1:
+                combined = header1
+            elif header2:
+                combined = header2
+            else:
+                combined = 'Unnamed'
+            
+            combined_headers.append(combined)
+        
+        # Make headers unique
         unique_headers = []
         header_counts = {}
         
-        for header in headers:
-            # Handle empty headers
-            if not header or header.strip() == '':
-                header = 'Unnamed'
-            
-            # Make duplicate headers unique
+        for header in combined_headers:
             if header in header_counts:
                 header_counts[header] += 1
                 unique_headers.append(f"{header}_{header_counts[header]}")
@@ -58,8 +73,8 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
                 header_counts[header] = 0
                 unique_headers.append(header)
         
-        # Create dataframe with unique headers
-        df = pd.DataFrame(data[1:], columns=unique_headers)
+        # Create dataframe with data starting from row 4 (index 3)
+        df = pd.DataFrame(data[3:], columns=unique_headers)
         
         # Remove completely empty columns
         df = df.loc[:, (df != '').any(axis=0)]
@@ -78,6 +93,7 @@ credentials = load_credentials()
 if credentials:
     # Input for Google Sheet URL
     sheet_url = "https://docs.google.com/spreadsheets/d/10GM76b6Y91ZfNelelaOvgXSLbqaPKHwfgMWN0x9Y42c"
+
     
     if sheet_url:
         # Load data from sheet index 0
