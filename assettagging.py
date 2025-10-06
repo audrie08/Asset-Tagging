@@ -108,12 +108,12 @@ if credentials:
         # DEBUG: Show first 10 rows of station column
         st.write(f"**DEBUG - First 10 values in {station_col}:**", df[station_col].head(10).tolist())
         
-        # Define stations
+        # Define stations - MUST MATCH EXACTLY with capital letters
         stations = {
-            'Hot Station': 'hot station',
-            'Fabrication Station': 'fabrication station',
-            'Pastry Station': 'pastry station',
-            'Packing Station': 'packing station'
+            'Hot Station': 'Hot Station',
+            'Fabrication Station': 'Fabrication Station',
+            'Pastry Station': 'Pastry Station',
+            'Packing Station': 'Packing Station'
         }
         
         # Create tabs
