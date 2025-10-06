@@ -8,108 +8,203 @@ import io
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="Asset Tagging", layout="wide")
 
-# Custom CSS for modern design without colors
+# Custom CSS for modern, sophisticated design
 st.markdown("""
 <style>
+    /* Global styles */
     .main {
-        padding: 1rem;
+        padding: 2rem;
+        background: #fafafa;
     }
     
-    .asset-card {
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+    /* Title styling */
+    h1 {
+        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0;
         background: white;
-        border: 1px solid #e0e0e0;
+        padding: 0.5rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
         border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
-    }
-    
-    .asset-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        border-color: #999;
-    }
-    
-    .asset-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .asset-number {
-        background: #f5f5f5;
-        padding: 4px 12px;
-        border-radius: 4px;
+        padding: 0 24px;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 14px;
+        border: none;
+        transition: all 0.2s ease;
     }
     
-    .asset-name {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 8px;
+    .stTabs [data-baseweb="tab"]:hover {
+        background: #f5f5f5;
     }
     
-    .asset-type {
-        color: #666;
-        font-size: 0.9rem;
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+        color: white !important;
+    }
+    
+    /* Input fields */
+    .stTextInput > div > div > input {
+        border-radius: 10px;
+        border: 2px solid #e5e5e5;
+        padding: 12px 16px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #333;
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    }
+    
+    .stSelectbox > div > div {
+        border-radius: 10px;
+        border: 2px solid #e5e5e5;
+    }
+    
+    /* Metrics */
+    [data-testid="stMetricValue"] {
+        font-size: 32px;
+        font-weight: 700;
+    }
+    
+    [data-testid="stMetric"] {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border: 1px solid #f0f0f0;
+    }
+    
+    /* Expander styling - Main asset names */
+    .streamlit-expanderHeader {
+        background: white !important;
+        border: 2px solid #e5e5e5 !important;
+        border-radius: 12px !important;
+        padding: 16px 20px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        border-color: #333 !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        transform: translateY(-1px);
+    }
+    
+    [data-testid="stExpander"] {
+        border: none !important;
+        box-shadow: none !important;
         margin-bottom: 12px;
     }
     
-    .badge {
-        display: inline-block;
-        background: #f5f5f5;
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        margin-right: 8px;
+    .streamlit-expanderContent {
+        background: #fafafa !important;
+        border: none !important;
+        border-radius: 0 0 12px 12px !important;
+        padding: 16px !important;
+        margin-top: -8px !important;
     }
     
+    /* Nested expanders for asset codes */
+    .streamlit-expanderContent .streamlit-expanderHeader {
+        background: white !important;
+        border: 1px solid #e5e5e5 !important;
+        border-radius: 8px !important;
+        padding: 12px 16px !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .streamlit-expanderContent .streamlit-expanderHeader:hover {
+        background: #f9f9f9 !important;
+        border-color: #999 !important;
+    }
+    
+    .streamlit-expanderContent .streamlit-expanderContent {
+        background: white !important;
+        padding: 16px !important;
+        border-radius: 8px !important;
+        margin-top: -8px !important;
+    }
+    
+    /* Detail rows */
     .detail-row {
         display: flex;
         justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #f5f5f5;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
     }
     
     .detail-label {
         color: #666;
-        font-size: 0.9rem;
+        font-size: 13px;
         font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
     
     .detail-value {
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 14px;
+        color: #1a1a1a;
     }
     
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
-        padding: 10px 20px;
-    }
-    
-    /* Make expanders wider */
-    .stExpander {
-        width: 100%;
-    }
-    
-    details {
-        width: 100%;
-    }
-    
-    .streamlit-expanderHeader {
-        font-size: 1rem;
+    /* Download button */
+    .stDownloadButton > button {
+        background: #1a1a1a;
+        color: white;
+        border-radius: 10px;
+        padding: 12px 24px;
         font-weight: 600;
+        border: none;
+        transition: all 0.2s ease;
     }
     
-    .streamlit-expanderContent {
-        padding: 1rem;
+    .stDownloadButton > button:hover {
+        background: #333;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transform: translateY(-1px);
+    }
+    
+    /* Caption text */
+    .css-1629p8f, [data-testid="stCaptionContainer"] {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Column spacing */
+    [data-testid="column"] {
+        padding: 0 6px;
+    }
+    
+    /* Remove extra padding */
+    .block-container {
+        padding-top: 2rem;
     }
 </style>
 """, unsafe_allow_html=True)
