@@ -94,8 +94,12 @@ if credentials:
     if not df.empty:
         st.success(f"✅ Loaded {len(df)} rows")
         
-        # Column C is index 2
-        station_col = df.columns[2]
+        # Remove Column A (index 0)
+        df = df.drop(df.columns[0], axis=1)
+        
+        # Column C is now index 1 after removing column A, Column E is now index 3
+        station_col = df.columns[1]
+        asset_name_col = df.columns[3]
         
         # Define stations - MUST MATCH EXACTLY with capital letters
         stations = {
@@ -112,9 +116,25 @@ if credentials:
         for tab, (tab_name, station_value) in zip(tabs, stations.items()):
             with tab:
                 # Filter where column C equals the station value
-                filtered = df[df[station_col] == station_value]
+                station_df = df[df[station_col] == station_value]
                 
-                if not filtered.empty:
+                if not station_df.empty:
+                    # Get unique asset names for this station
+                    asset_names = ['All'] + sorted(station_df[asset_name_col].unique().tolist())
+                    
+                    # Asset name filter
+                    selected_asset = st.selectbox(
+                        "Filter by Asset Name:",
+                        options=asset_names,
+                        key=f"filter_{station_value}"
+                    )
+                    
+                    # Apply asset name filter
+                    if selected_asset == 'All':
+                        filtered = station_df
+                    else:
+                        filtered = station_df[station_df[asset_name_col] == selected_asset]
+                    
                     st.metric("Rows", len(filtered))
                     st.dataframe(filtered, use_container_width=True)
                     
