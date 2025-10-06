@@ -4,24 +4,22 @@ import gspread
 from google.oauth2.service_account import Credentials
 import warnings
 import io
+import streamlit.components.v1 as components
 
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="Asset Tagging", layout="wide")
 
-# Custom CSS for modern, sophisticated design
+# Custom CSS
 st.markdown("""
 <style>
-    /* Global styles */
     .main {
         padding: 2rem;
         background: #fafafa;
     }
     
-    /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
-    /* Title styling */
     h1 {
         font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-weight: 700;
@@ -29,7 +27,6 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
     
-    /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 0;
         background: white;
@@ -58,7 +55,6 @@ st.markdown("""
         color: white !important;
     }
     
-    /* Input fields */
     .stTextInput > div > div > input {
         border-radius: 10px;
         border: 2px solid #e5e5e5;
@@ -77,7 +73,6 @@ st.markdown("""
         border: 2px solid #e5e5e5;
     }
     
-    /* Metrics */
     [data-testid="stMetricValue"] {
         font-size: 32px;
         font-weight: 700;
@@ -91,89 +86,6 @@ st.markdown("""
         border: 1px solid #f0f0f0;
     }
     
-    /* Expander styling - Main asset names */
-    .streamlit-expanderHeader {
-        background: white !important;
-        border: 2px solid #e5e5e5 !important;
-        border-radius: 12px !important;
-        padding: 16px 20px !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-        transition: all 0.2s ease !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
-        margin-bottom: 8px !important;
-    }
-    
-    .streamlit-expanderHeader:hover {
-        border-color: #333 !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-        transform: translateY(-1px);
-    }
-    
-    [data-testid="stExpander"] {
-        border: none !important;
-        box-shadow: none !important;
-        margin-bottom: 12px;
-    }
-    
-    .streamlit-expanderContent {
-        background: #fafafa !important;
-        border: none !important;
-        border-radius: 0 0 12px 12px !important;
-        padding: 16px !important;
-        margin-top: -8px !important;
-    }
-    
-    /* Nested expanders for asset codes */
-    .streamlit-expanderContent .streamlit-expanderHeader {
-        background: white !important;
-        border: 1px solid #e5e5e5 !important;
-        border-radius: 8px !important;
-        padding: 12px 16px !important;
-        font-size: 13px !important;
-        font-weight: 500 !important;
-        margin-bottom: 8px !important;
-    }
-    
-    .streamlit-expanderContent .streamlit-expanderHeader:hover {
-        background: #f9f9f9 !important;
-        border-color: #999 !important;
-    }
-    
-    .streamlit-expanderContent .streamlit-expanderContent {
-        background: white !important;
-        padding: 16px !important;
-        border-radius: 8px !important;
-        margin-top: -8px !important;
-    }
-    
-    /* Detail rows */
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .detail-row:last-child {
-        border-bottom: none;
-    }
-    
-    .detail-label {
-        color: #666;
-        font-size: 13px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    
-    .detail-value {
-        font-weight: 600;
-        font-size: 14px;
-        color: #1a1a1a;
-    }
-    
-    /* Download button */
     .stDownloadButton > button {
         background: #1a1a1a;
         color: white;
@@ -190,19 +102,10 @@ st.markdown("""
         transform: translateY(-1px);
     }
     
-    /* Caption text */
-    .css-1629p8f, [data-testid="stCaptionContainer"] {
-        color: #666;
-        font-size: 13px;
-        margin-bottom: 1.5rem;
-    }
-    
-    /* Column spacing */
     [data-testid="column"] {
         padding: 0 6px;
     }
     
-    /* Remove extra padding */
     .block-container {
         padding-top: 2rem;
     }
@@ -277,26 +180,136 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
-def display_asset_details(row, columns):
-    """Display individual asset details"""
-    col1, col2, col3 = st.columns(3)
+def create_asset_card_html(asset_name, count, asset_codes, key):
+    """Create HTML for asset card"""
+    preview_codes = asset_codes[:2] if len(asset_codes) > 2 else asset_codes
+    preview_html = "".join([f'<div class="asset-tag">{code}</div>' for code in preview_codes])
+    if len(asset_codes) > 2:
+        preview_html += f'<div class="asset-tag">+{len(asset_codes) - 2} more</div>'
     
-    with col1:
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Number</span><span class="detail-value">{row.get(columns[0], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Name</span><span class="detail-value">{row.get(columns[3], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Quantity</span><span class="detail-value">{row.get(columns[4], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">{row.get(columns[2], "N/A")}</span></div>', unsafe_allow_html=True)
+    return f"""
+    <div class="asset-card" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', key: '{key}', value: '{asset_name}'}}, '*')">
+        <div class="asset-name">{asset_name}</div>
+        <div class="asset-count">{count} items</div>
+        <div class="asset-preview">
+            {preview_html}
+        </div>
+    </div>
+    """
+
+def render_asset_cards_grid(grouped_df, asset_name_col, df_columns, station_key):
+    """Render asset cards in grid layout"""
+    asset_card_style = """
+    <style>
+        .asset-card {
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+        .asset-card:hover {
+            border-color: #333;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+        .asset-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .asset-count {
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .asset-preview {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .asset-tag {
+            background: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #666;
+        }
+    </style>
+    """
     
-    with col2:
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Station</span><span class="detail-value">{row.get(columns[1], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Length (cm)</span><span class="detail-value">{row.get(columns[5], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Width (cm)</span><span class="detail-value">{row.get(columns[6], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Height (cm)</span><span class="detail-value">{row.get(columns[7], "N/A")}</span></div>', unsafe_allow_html=True)
+    grouped = grouped_df.groupby(asset_name_col)
+    asset_groups = list(grouped)
     
-    with col3:
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Rated Voltage</span><span class="detail-value">{row.get(columns[9], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Power</span><span class="detail-value">{row.get(columns[10], "N/A")}</span></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">{row.get(columns[11], "N/A")}</span></div>', unsafe_allow_html=True)
+    num_cols = 5
+    for i in range(0, len(asset_groups), num_cols):
+        cols = st.columns(num_cols)
+        batch = asset_groups[i:i + num_cols]
+        
+        for col_idx, (asset_name, group_df) in enumerate(batch):
+            with cols[col_idx]:
+                asset_codes = group_df[df_columns[0]].tolist()
+                card_key = f"{station_key}_{asset_name.replace(' ', '_')}"
+                
+                # Create clickable card
+                if st.button(f"📦 {asset_name}", key=card_key, use_container_width=True):
+                    st.session_state[f'modal_{station_key}'] = asset_name
+                    st.session_state[f'modal_data_{station_key}'] = group_df
+                
+                # Show preview info
+                st.caption(f"{len(group_df)} items")
+
+def render_modal(asset_name, group_df, df_columns, station_key):
+    """Render modal with asset details"""
+    st.markdown(f"### {asset_name} ({len(group_df)} items)")
+    
+    if st.button("✕ Close", key=f"close_{station_key}"):
+        if f'modal_{station_key}' in st.session_state:
+            del st.session_state[f'modal_{station_key}']
+        if f'modal_data_{station_key}' in st.session_state:
+            del st.session_state[f'modal_data_{station_key}']
+        st.rerun()
+    
+    st.markdown("---")
+    
+    # Display each asset with expander
+    for idx, row in group_df.iterrows():
+        asset_number = row.get(df_columns[0], 'N/A')
+        
+        with st.expander(f"🔖 {asset_number}"):
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.markdown(f"**TYPE**")
+                st.write(row.get(df_columns[2], "N/A"))
+                st.markdown(f"**QUANTITY**")
+                st.write(row.get(df_columns[4], "N/A"))
+                
+            with col2:
+                st.markdown(f"**DIMENSIONS**")
+                dims = f"{row.get(df_columns[5], 'N/A')} × {row.get(df_columns[6], 'N/A')} × {row.get(df_columns[7], 'N/A')} cm"
+                st.write(dims)
+                st.markdown(f"**VOLTAGE**")
+                st.write(row.get(df_columns[9], "N/A"))
+                
+            with col3:
+                st.markdown(f"**POWER**")
+                st.write(row.get(df_columns[10], "N/A"))
+                st.markdown(f"**STATUS**")
+                status = row.get(df_columns[11], "N/A")
+                if "Working" in status:
+                    st.success(status)
+                else:
+                    st.error(status)
 
 # Main App
 st.title("🏷️ Asset Tagging System")
@@ -311,12 +324,10 @@ if credentials:
         df = load_sheet_data(credentials, sheet_url, sheet_index=0)
     
     if not df.empty:
-        # Remove Column A (index 0 - Unnamed)
         df = df.drop(df.columns[0], axis=1)
         
-        # Update column indices after removing column A
-        station_col = df.columns[1]  # Station (was index 2, now index 1)
-        asset_name_col = df.columns[3]  # Asset Name (was index 4, now index 3)
+        station_col = df.columns[1]
+        asset_name_col = df.columns[3]
         
         # Statistics
         col1, col2, col3 = st.columns(3)
@@ -331,7 +342,6 @@ if credentials:
         
         st.markdown("---")
         
-        # Define stations
         stations = {
             'Hot Station': 'Hot Station',
             'Fabrication Station': 'Fabrication Station',
@@ -339,67 +349,54 @@ if credentials:
             'Packing Station': 'Packing Station'
         }
         
-        # Create tabs
         tabs = st.tabs(list(stations.keys()))
         
-        # Filter and display data for each station
         for tab, (tab_name, station_value) in zip(tabs, stations.items()):
             with tab:
-                # Filter by station
                 station_df = df[df[station_col] == station_value]
                 
                 if not station_df.empty:
-                    # Search and filter section
-                    col_search, col_filter = st.columns([2, 1])
+                    station_key = station_value.replace(' ', '_')
                     
-                    with col_search:
-                        search_term = st.text_input("🔍 Search assets", placeholder="Type to search...", key=f"search_{station_value}")
-                    
-                    with col_filter:
-                        asset_names = ['All'] + sorted(station_df[asset_name_col].unique().tolist())
-                        selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}")
-                    
-                    # Apply filters
-                    filtered = station_df.copy()
-                    
-                    if selected_asset != 'All':
-                        filtered = filtered[filtered[asset_name_col] == selected_asset]
-                    
-                    if search_term:
-                        mask = filtered[asset_name_col].str.contains(search_term, case=False, na=False)
-                        filtered = filtered[mask]
-                    
-                    st.caption(f"Showing {len(filtered)} of {len(station_df)} assets")
-                    
-                    # Display assets as cards
-                    if not filtered.empty:
-                        # Group by Asset Name
-                        grouped = filtered.groupby(asset_name_col)
-                        asset_groups = list(grouped)
-                        
-                        # Display in 5 columns
-                        num_cols = 5
-                        for i in range(0, len(asset_groups), num_cols):
-                            cols = st.columns(num_cols)
-                            
-                            # Get the batch of asset groups for this row
-                            batch = asset_groups[i:i + num_cols]
-                            
-                            for col_idx, (asset_name, group_df) in enumerate(batch):
-                                with cols[col_idx]:
-                                    # First level expander - Asset Name with count
-                                    with st.expander(f"📋 {asset_name} ({len(group_df)})"):
-                                        # Second level - Individual asset codes
-                                        for idx, row in group_df.iterrows():
-                                            asset_number = row.get(df.columns[0], 'N/A')
-                                            with st.expander(f"🔖 {asset_number}"):
-                                                display_asset_details(row, df.columns)
+                    # Check if modal is open
+                    if f'modal_{station_key}' in st.session_state:
+                        # Show modal
+                        render_modal(
+                            st.session_state[f'modal_{station_key}'],
+                            st.session_state[f'modal_data_{station_key}'],
+                            df.columns,
+                            station_key
+                        )
                     else:
-                        st.info("No assets found matching your filters.")
+                        # Show card grid
+                        col_search, col_filter = st.columns([2, 1])
+                        
+                        with col_search:
+                            search_term = st.text_input("🔍 Search assets", placeholder="Type to search...", key=f"search_{station_value}")
+                        
+                        with col_filter:
+                            asset_names = ['All'] + sorted(station_df[asset_name_col].unique().tolist())
+                            selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}")
+                        
+                        filtered = station_df.copy()
+                        
+                        if selected_asset != 'All':
+                            filtered = filtered[filtered[asset_name_col] == selected_asset]
+                        
+                        if search_term:
+                            mask = filtered[asset_name_col].str.contains(search_term, case=False, na=False)
+                            filtered = filtered[mask]
+                        
+                        st.caption(f"Showing {len(filtered)} of {len(station_df)} assets")
+                        
+                        if not filtered.empty:
+                            render_asset_cards_grid(filtered, asset_name_col, df.columns, station_key)
+                        else:
+                            st.info("No assets found matching your filters.")
                     
                     # Download button
                     st.markdown("---")
-                    csv = filtered.to_csv(index=False)
+                    csv = station_df.to_csv(index=False)
                     st.download_button(
                         label=f"📥 Download {tab_name} Data (CSV)",
                         data=csv,
