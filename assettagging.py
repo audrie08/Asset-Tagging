@@ -166,7 +166,9 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
 
 def display_asset_card(row, columns, unique_key):
     """Display individual asset as a card"""
-    with st.expander(f"📋 {row.get(columns[3], 'Unknown Asset')}", key=unique_key):
+    # Make the label unique by including asset number
+    label = f"📋 {row.get(columns[3], 'Unknown Asset')} - {row.get(columns[0], 'N/A')}"
+    with st.expander(label):
         col1, col2, col3 = st.columns(3)
         
         with col1:
