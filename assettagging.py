@@ -101,8 +101,8 @@ if credentials:
     if not df.empty:
         st.success(f"✅ Successfully loaded {len(df)} rows")
         
-        # Assume first column contains station info (you can change this index)
-        station_column = df.columns[0]
+        # Station data is in column C (index 2)
+        station_column = df.columns[2]
         
         # Define stations
         stations = ['hot station', 'fabrication station', 'pastry station', 'packing station']
