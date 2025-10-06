@@ -166,38 +166,25 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
 
 def display_asset_card(row, columns):
     """Display individual asset as a card"""
-    with st.container():
-        st.markdown(f"""
-        <div class="asset-card">
-            <div class="asset-header">
-                <span class="asset-number">{row.get(columns[0], 'N/A')}</span>
-            </div>
-            <div class="asset-name">{row.get(columns[3], 'Unknown Asset')}</div>
-            <div class="asset-type">{row.get(columns[2], 'N/A')}</div>
-            <div>
-                <span class="badge">📦 Qty: {row.get(columns[4], '0')}</span>
-                <span class="badge">{"✓ " + row.get(columns[11], 'Unknown') if columns[11] in row else 'Status Unknown'}</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+    with st.expander(f"📋 {row.get(columns[3], 'Unknown Asset')}"):
+        col1, col2, col3 = st.columns(3)
         
-        with st.expander("📋 View Details"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Number</span><span class="detail-value">{row.get(columns[0], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Station</span><span class="detail-value">{row.get(columns[1], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">{row.get(columns[2], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Name</span><span class="detail-value">{row.get(columns[3], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Quantity</span><span class="detail-value">{row.get(columns[4], "N/A")}</span></div>', unsafe_allow_html=True)
-            
-            with col2:
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Length (cm)</span><span class="detail-value">{row.get(columns[5], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Width (cm)</span><span class="detail-value">{row.get(columns[6], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Height (cm)</span><span class="detail-value">{row.get(columns[7], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Rated Voltage</span><span class="detail-value">{row.get(columns[9], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Power</span><span class="detail-value">{row.get(columns[10], "N/A")}</span></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">{row.get(columns[11], "N/A")}</span></div>', unsafe_allow_html=True)
+        with col1:
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Number</span><span class="detail-value">{row.get(columns[0], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Name</span><span class="detail-value">{row.get(columns[3], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Quantity</span><span class="detail-value">{row.get(columns[4], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">{row.get(columns[2], "N/A")}</span></div>', unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Station</span><span class="detail-value">{row.get(columns[1], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Length (cm)</span><span class="detail-value">{row.get(columns[5], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Width (cm)</span><span class="detail-value">{row.get(columns[6], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Height (cm)</span><span class="detail-value">{row.get(columns[7], "N/A")}</span></div>', unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Rated Voltage</span><span class="detail-value">{row.get(columns[9], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Power</span><span class="detail-value">{row.get(columns[10], "N/A")}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">{row.get(columns[11], "N/A")}</span></div>', unsafe_allow_html=True)
 
 # Main App
 st.title("🏷️ Asset Tagging System")
