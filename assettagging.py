@@ -164,29 +164,26 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
-def display_asset_card(row, columns, unique_key):
-    """Display individual asset as a card"""
-    # Make the label unique by including asset number
-    label = f"📋 {row.get(columns[3], 'Unknown Asset')} - {row.get(columns[0], 'N/A')}"
-    with st.expander(label):
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Number</span><span class="detail-value">{row.get(columns[0], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Name</span><span class="detail-value">{row.get(columns[3], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Quantity</span><span class="detail-value">{row.get(columns[4], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">{row.get(columns[2], "N/A")}</span></div>', unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Station</span><span class="detail-value">{row.get(columns[1], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Length (cm)</span><span class="detail-value">{row.get(columns[5], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Width (cm)</span><span class="detail-value">{row.get(columns[6], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Height (cm)</span><span class="detail-value">{row.get(columns[7], "N/A")}</span></div>', unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Rated Voltage</span><span class="detail-value">{row.get(columns[9], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Power</span><span class="detail-value">{row.get(columns[10], "N/A")}</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">{row.get(columns[11], "N/A")}</span></div>', unsafe_allow_html=True)
+def display_asset_details(row, columns):
+    """Display individual asset details"""
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Number</span><span class="detail-value">{row.get(columns[0], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Asset Name</span><span class="detail-value">{row.get(columns[3], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Quantity</span><span class="detail-value">{row.get(columns[4], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">{row.get(columns[2], "N/A")}</span></div>', unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Station</span><span class="detail-value">{row.get(columns[1], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Length (cm)</span><span class="detail-value">{row.get(columns[5], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Width (cm)</span><span class="detail-value">{row.get(columns[6], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Height (cm)</span><span class="detail-value">{row.get(columns[7], "N/A")}</span></div>', unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Rated Voltage</span><span class="detail-value">{row.get(columns[9], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Power</span><span class="detail-value">{row.get(columns[10], "N/A")}</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">{row.get(columns[11], "N/A")}</span></div>', unsafe_allow_html=True)
 
 # Main App
 st.title("🏷️ Asset Tagging System")
@@ -263,10 +260,17 @@ if credentials:
                     
                     # Display assets as cards
                     if not filtered.empty:
-                        for idx, row in filtered.iterrows():
-                            # Create unique key using station value and row index
-                            unique_key = f"{station_value}_{idx}"
-                            display_asset_card(row, df.columns, unique_key)
+                        # Group by Asset Name
+                        grouped = filtered.groupby(asset_name_col)
+                        
+                        for asset_name, group_df in grouped:
+                            # First level expander - Asset Name with count
+                            with st.expander(f"📋 {asset_name} ({len(group_df)} items)"):
+                                # Second level - Individual asset codes
+                                for idx, row in group_df.iterrows():
+                                    asset_number = row.get(df.columns[0], 'N/A')
+                                    with st.expander(f"🔖 {asset_number}"):
+                                        display_asset_details(row, df.columns)
                     else:
                         st.info("No assets found matching your filters.")
                     
