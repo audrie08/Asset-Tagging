@@ -164,9 +164,9 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
-def display_asset_card(row, columns):
+def display_asset_card(row, columns, unique_key):
     """Display individual asset as a card"""
-    with st.expander(f"📋 {row.get(columns[3], 'Unknown Asset')}"):
+    with st.expander(f"📋 {row.get(columns[3], 'Unknown Asset')}", key=unique_key):
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -262,7 +262,9 @@ if credentials:
                     # Display assets as cards
                     if not filtered.empty:
                         for idx, row in filtered.iterrows():
-                            display_asset_card(row, df.columns)
+                            # Create unique key using station value and row index
+                            unique_key = f"{station_value}_{idx}"
+                            display_asset_card(row, df.columns, unique_key)
                     else:
                         st.info("No assets found matching your filters.")
                     
