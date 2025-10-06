@@ -344,27 +344,10 @@ if credentials:
                                         color = get_avatar_color(asset_name)
                                         count = len(group_df)
                                         
-                                        # Display card with avatar
-                                        st.markdown(f'''
-                                        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.25rem; margin-bottom: 0.5rem;">
-                                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                                <div style="width: 40px; height: 40px; border-radius: 50%; background: {color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px; flex-shrink: 0;">
-                                                    {initial}
-                                                </div>
-                                                <div style="flex: 1; min-width: 0;">
-                                                    <div style="font-weight: 600; font-size: 14px; color: #1a1a1a; margin-bottom: 6px; line-height: 1.4;">
-                                                        {asset_name}
-                                                    </div>
-                                                    <div style="font-size: 12px; color: #666;">
-                                                        {count} items
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        ''', unsafe_allow_html=True)
+                                        # Single clickable button styled as a card
+                                        button_label = f"{asset_name}\n{count} items"
                                         
-                                        # Invisible button for click functionality
-                                        if st.button("View Details", key=f"{station_key}_{asset_name}", use_container_width=True):
+                                        if st.button(button_label, key=f"{station_key}_{asset_name}", use_container_width=True):
                                             st.session_state[f'modal_{station_key}'] = asset_name
                                             st.session_state[f'modal_data_{station_key}'] = group_df
                                             st.rerun()
