@@ -94,8 +94,19 @@ if credentials:
     if not df.empty:
         st.success(f"✅ Loaded {len(df)} rows")
         
+        # DEBUG: Show all columns
+        st.write("**DEBUG - All Columns:**", df.columns.tolist())
+        
         # Column C is index 2
         station_col = df.columns[2]
+        st.write(f"**DEBUG - Using Column:** '{station_col}' (index 2)")
+        
+        # DEBUG: Show unique values in station column
+        unique_stations = df[station_col].unique().tolist()
+        st.write(f"**DEBUG - Unique values in {station_col}:**", unique_stations)
+        
+        # DEBUG: Show first 10 rows of station column
+        st.write(f"**DEBUG - First 10 values in {station_col}:**", df[station_col].head(10).tolist())
         
         # Define stations
         stations = {
@@ -113,6 +124,9 @@ if credentials:
             with tab:
                 # Filter where column C equals the station value
                 filtered = df[df[station_col] == station_value]
+                
+                st.write(f"**DEBUG - Looking for:** '{station_value}'")
+                st.write(f"**DEBUG - Found {len(filtered)} rows**")
                 
                 if not filtered.empty:
                     st.metric("Rows", len(filtered))
