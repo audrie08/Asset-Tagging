@@ -262,15 +262,25 @@ if credentials:
                     if not filtered.empty:
                         # Group by Asset Name
                         grouped = filtered.groupby(asset_name_col)
+                        asset_groups = list(grouped)
                         
-                        for asset_name, group_df in grouped:
-                            # First level expander - Asset Name with count
-                            with st.expander(f"📋 {asset_name} ({len(group_df)} items)"):
-                                # Second level - Individual asset codes
-                                for idx, row in group_df.iterrows():
-                                    asset_number = row.get(df.columns[0], 'N/A')
-                                    with st.expander(f"🔖 {asset_number}"):
-                                        display_asset_details(row, df.columns)
+                        # Display in 4 columns
+                        num_cols = 4
+                        for i in range(0, len(asset_groups), num_cols):
+                            cols = st.columns(num_cols)
+                            
+                            # Get the batch of asset groups for this row
+                            batch = asset_groups[i:i + num_cols]
+                            
+                            for col_idx, (asset_name, group_df) in enumerate(batch):
+                                with cols[col_idx]:
+                                    # First level expander - Asset Name with count
+                                    with st.expander(f"📋 {asset_name} ({len(group_df)})"):
+                                        # Second level - Individual asset codes
+                                        for idx, row in group_df.iterrows():
+                                            asset_number = row.get(df.columns[0], 'N/A')
+                                            with st.expander(f"🔖 {asset_number}"):
+                                                display_asset_details(row, df.columns)
                     else:
                         st.info("No assets found matching your filters.")
                     
