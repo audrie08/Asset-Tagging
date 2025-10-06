@@ -49,7 +49,6 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
             header1 = row1_headers[i].strip() if i < len(row1_headers) else ''
             header2 = row2_headers[i].strip() if i < len(row2_headers) else ''
             
-            # Combine the two rows
             if header1 and header2:
                 combined = f"{header1} {header2}"
             elif header1:
@@ -76,82 +75,60 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         # Create dataframe with data starting from row 4 (index 3)
         df = pd.DataFrame(data[3:], columns=unique_headers)
         
-        # Remove completely empty columns
-        df = df.loc[:, (df != '').any(axis=0)]
-        
         return df
     except Exception as e:
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
 # Main App
-st.title("🏷️ Asset Tagging - Station Filter")
+st.title("🏷️ Asset Tagging")
 
-# Load credentials
 credentials = load_credentials()
 
 if credentials:
-    # Hardcoded Google Sheet URL
     sheet_url = "https://docs.google.com/spreadsheets/d/10GM76b6Y91ZfNelelaOvgXSLbqaPKHwfgMWN0x9Y42c"
     
-    # Load data from sheet index 0
-    with st.spinner("Loading data from Google Sheets..."):
+    with st.spinner("Loading data..."):
         df = load_sheet_data(credentials, sheet_url, sheet_index=0)
     
     if not df.empty:
-        st.success(f"✅ Successfully loaded {len(df)} rows")
+        st.success(f"✅ Loaded {len(df)} rows")
         
-        # Station data is in column C (index 2)
-        station_column = df.columns[2]
+        # Column C is index 2
+        station_col = df.columns[2]
         
         # Define stations
-        stations = ['hot station', 'fabrication station', 'pastry station', 'packing station']
+        stations = {
+            'Hot Station': 'hot station',
+            'Fabrication Station': 'fabrication station',
+            'Pastry Station': 'pastry station',
+            'Packing Station': 'packing station'
+        }
         
-        # Create tabs for each station
-        st.subheader("🏭 Station Data")
-        tabs = st.tabs([s.title() for s in stations])
+        # Create tabs
+        tabs = st.tabs(list(stations.keys()))
         
-        # Individual station tabs
-        for idx, station in enumerate(stations):
-            with tabs[idx]:
-                # Filter dataframe for this station (case-insensitive)
-                filtered_df = df[df[station_column].str.lower().str.contains(station, na=False)]
+        # Filter and display data for each station
+        for tab, (tab_name, station_value) in zip(tabs, stations.items()):
+            with tab:
+                # Filter where column C equals the station value
+                filtered = df[df[station_col] == station_value]
                 
-                if not filtered_df.empty:
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.metric(f"{station.title()} Rows", len(filtered_df))
-                    with col2:
-                        st.metric("Columns", len(filtered_df.columns))
+                if not filtered.empty:
+                    st.metric("Rows", len(filtered))
+                    st.dataframe(filtered, use_container_width=True)
                     
-                    st.dataframe(filtered_df, use_container_width=True)
-                    
-                    # Download button for filtered data
-                    csv_filtered = filtered_df.to_csv(index=False)
+                    csv = filtered.to_csv(index=False)
                     st.download_button(
-                        label=f"📥 Download {station.title()} Data",
-                        data=csv_filtered,
-                        file_name=f"{station.replace(' ', '_')}_data.csv",
+                        label="📥 Download CSV",
+                        data=csv,
+                        file_name=f"{station_value.replace(' ', '_')}.csv",
                         mime="text/csv",
-                        key=f"download_{station}"
+                        key=f"btn_{station_value}"
                     )
                 else:
-                    st.warning(f"No data found for {station.title()}")
-        
-        # Additional options
-        with st.expander("🔍 View Data Info"):
-            st.write("**Column Names:**")
-            st.write(list(df.columns))
-            st.write("**Data Types:**")
-            buffer = io.StringIO()
-            df.info(buf=buffer)
-            st.text(buffer.getvalue())
-            
-            st.write("**Station Distribution:**")
-            if station_column in df.columns:
-                station_counts = df[station_column].value_counts()
-                st.dataframe(station_counts)
+                    st.warning(f"No rows found for {station_value}")
     else:
-        st.warning("No data found in the sheet or an error occurred.")
+        st.error("No data loaded")
 else:
-    st.error("Failed to load credentials. Please check your secrets configuration.")
+    st.error("Failed to load credentials")
