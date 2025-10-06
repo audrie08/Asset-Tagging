@@ -6,7 +6,7 @@ import warnings
 import io
 
 warnings.filterwarnings('ignore')
-st.set_page_config(page_title="BOM Explosion", layout="wide")
+st.set_page_config(page_title="Asset Tagging", layout="wide")
 
 @st.cache_resource
 def load_credentials():
@@ -85,15 +85,17 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 # Main App
-st.title("Asset Tagging")
+st.title("🏷️ Asset Tagging - Station Filter")
 
 # Load credentials
 credentials = load_credentials()
 
 if credentials:
     # Input for Google Sheet URL
-    sheet_url = "https://docs.google.com/spreadsheets/d/10GM76b6Y91ZfNelelaOvgXSLbqaPKHwfgMWN0x9Y42c"
-
+    sheet_url = st.text_input(
+        "Enter Google Sheet URL:",
+        value="https://docs.google.com/spreadsheets/d/10GM76b6Y91ZfNelelaOvgXSLbqaPKHwfgMWN0x9Y42c"
+    )
     
     if sheet_url:
         # Load data from sheet index 0
@@ -101,20 +103,62 @@ if credentials:
             df = load_sheet_data(credentials, sheet_url, sheet_index=0)
         
         if not df.empty:
-            # Display dataframe info
             st.success(f"✅ Successfully loaded data from Sheet Index 0")
             
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Rows", len(df))
-            with col2:
-                st.metric("Columns", len(df.columns))
-            with col3:
-                st.metric("Sheet Index", 0)
+            # Let user select which column contains station info
+            st.subheader("🔧 Filter Configuration")
+            station_column = st.selectbox(
+                "Select the column that contains station information:",
+                options=df.columns.tolist(),
+                index=0
+            )
             
-            # Display the dataframe
-            st.subheader("📋 Dataframe")
-            st.dataframe(df, use_container_width=True)
+            # Define stations
+            stations = ['hot kitchen', 'fabrication', 'pastry', 'packing']
+            
+            # Create tabs for each station
+            st.subheader("🏭 Station Data")
+            tabs = st.tabs(['All Data'] + [s.title() for s in stations])
+            
+            # All Data tab
+            with tabs[0]:
+                st.metric("Total Rows", len(df))
+                st.dataframe(df, use_container_width=True)
+                
+                csv_all = df.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download All Data",
+                    data=csv_all,
+                    file_name="all_stations_data.csv",
+                    mime="text/csv"
+                )
+            
+            # Individual station tabs
+            for idx, station in enumerate(stations, 1):
+                with tabs[idx]:
+                    # Filter dataframe for this station (case-insensitive)
+                    filtered_df = df[df[station_column].str.lower().str.contains(station, na=False)]
+                    
+                    if not filtered_df.empty:
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.metric(f"{station.title()} Rows", len(filtered_df))
+                        with col2:
+                            st.metric("Columns", len(filtered_df.columns))
+                        
+                        st.dataframe(filtered_df, use_container_width=True)
+                        
+                        # Download button for filtered data
+                        csv_filtered = filtered_df.to_csv(index=False)
+                        st.download_button(
+                            label=f"📥 Download {station.title()} Data",
+                            data=csv_filtered,
+                            file_name=f"{station.replace(' ', '_')}_data.csv",
+                            mime="text/csv",
+                            key=f"download_{station}"
+                        )
+                    else:
+                        st.warning(f"No data found for {station.title()}")
             
             # Additional options
             with st.expander("🔍 View Data Info"):
@@ -124,15 +168,11 @@ if credentials:
                 buffer = io.StringIO()
                 df.info(buf=buffer)
                 st.text(buffer.getvalue())
-            
-            # Download option
-            csv = df.to_csv(index=False)
-            st.download_button(
-                label="📥 Download as CSV",
-                data=csv,
-                file_name="spreadsheet_data.csv",
-                mime="text/csv"
-            )
+                
+                st.write("**Station Distribution:**")
+                if station_column in df.columns:
+                    station_counts = df[station_column].value_counts()
+                    st.dataframe(station_counts)
         else:
             st.warning("No data found in the sheet or an error occurred.")
 else:
