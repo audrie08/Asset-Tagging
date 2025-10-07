@@ -347,24 +347,30 @@ if credentials:
                                                 color = get_avatar_color(asset_name)
                                                 count = len(group_df)
                                                 
-                                                # Create clickable metric-style card
+                                                # Create clickable metric-style card with CSS hover
                                                 st.markdown(f"""
-                                                <div style="
+                                                <style>
+                                                .asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')} {{
                                                     background: white;
                                                     border: 1px solid #f0f0f0;
-                                                    border-radius: 30px;
+                                                    border-radius: 12px;
                                                     padding: 1.5rem 1.25rem;
                                                     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
                                                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                                                    cursor: pointer;
                                                     min-height: 130px;
                                                     display: flex;
                                                     flex-direction: column;
                                                     justify-content: space-between;
-                                                    margin-bottom: 90px;
-                                                "
-                                                onmouseover="this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)'; this.style.transform='translateY(-6px)'; this.style.borderColor='#ddd'; this.style.background='#fafafa';"
-                                                onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)'; this.style.borderColor='#f0f0f0'; this.style.background='white';">
+                                                    margin-bottom: 20px;
+                                                }}
+                                                .asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')}:hover {{
+                                                    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+                                                    transform: translateY(-6px);
+                                                    border-color: #ddd;
+                                                    background: #fafafa;
+                                                }}
+                                                </style>
+                                                <div class="asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')}">
                                                     <div>
                                                         <div style="
                                                             font-size: 18px;
@@ -391,7 +397,7 @@ if credentials:
                                                 </div>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                # Invisible button for functionality that fills the space
+                                                # Invisible button for functionality - now with pointer-events to allow hover
                                                 st.markdown("""
                                                 <style>
                                                 .element-container:has(> .stButton) {
@@ -407,6 +413,7 @@ if credentials:
                                                     cursor: pointer;
                                                     margin: 0;
                                                     padding: 0;
+                                                    pointer-events: all;
                                                 }
                                                 </style>
                                                 """, unsafe_allow_html=True)
@@ -417,19 +424,6 @@ if credentials:
                                                     st.rerun()
                                 else:
                                     st.info("No assets found")
-                    
-                    # Download button
-                    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-                    csv = station_df.to_csv(index=False)
-                    st.download_button(
-                        label=f"Download {tab_name} Data",
-                        data=csv,
-                        file_name=f"{station_value.replace(' ', '_')}.csv",
-                        mime="text/csv",
-                        key=f"btn_{station_value}"
-                    )
-                else:
-                    st.warning(f"No assets found for {station_value}")
     else:
         st.error("No data loaded")
 else:
