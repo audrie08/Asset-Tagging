@@ -109,18 +109,6 @@ st.markdown("""
         color: #1a1a1a !important;
     }
     
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        background: white !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 8px !important;
-        padding: 14px 18px !important;
-        font-weight: 500 !important;
-        font-size: 14px !important;
-        margin-bottom: 12px !important;
-        margin-top: 50px !important;
-
-    }
     .streamlit-expanderHeader:hover {
         border-color: #999 !important;
     }
