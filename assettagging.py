@@ -316,17 +316,18 @@ if credentials:
                             type_options = ['All', 'Tools', 'Equipment']
                             selected_type = st.selectbox("Filter by Type", options=type_options, key=f"type_{station_value}")
                         
-                        with col_asset:
-                            asset_names = ['All'] + sorted(station_df[asset_name_col].unique().tolist())
-                            selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}")
-                        
+                        # Filter by type first, then populate asset names based on filtered results
                         filtered = station_df.copy()
                         
-                        # Apply type filter
                         if selected_type != 'All':
                             filtered = filtered[filtered[type_col].str.contains(selected_type, case=False, na=False)]
                         
-                        # Apply asset name filter
+                        with col_asset:
+                            # Get asset names from the type-filtered data
+                            asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
+                            selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}")
+                        
+                        # Apply asset name filter on already type-filtered data
                         if selected_asset != 'All':
                             filtered = filtered[filtered[asset_name_col] == selected_asset]
                         
