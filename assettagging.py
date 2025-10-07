@@ -357,6 +357,7 @@ if credentials:
                                             display: flex;
                                             flex-direction: column;
                                             justify-content: space-between;
+                                            margin-bottom: 20px;
                                         "
                                         onmouseover="this.style.boxShadow='0 8px 16px rgba(0,0,0,0.12)'; this.style.transform='translateY(-4px)';"
                                         onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';">
@@ -391,7 +392,8 @@ if credentials:
                                         <style>
                                         .element-container:has(> .stButton) {
                                             position: relative;
-                                            margin-top: -150px;
+                                            margin-top: -170px;
+                                            margin-bottom: 20px;
                                             z-index: 10;
                                         }
                                         .element-container:has(> .stButton) button {
