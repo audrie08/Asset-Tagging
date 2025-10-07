@@ -308,20 +308,44 @@ if credentials:
                                     st.write(row.get(df.columns[11], "N/A"))
                     else:
                         # Card grid view
-                        col_search, col_filter = st.columns([2, 1])
+                        # Type filter (Tools or Equipment)
+                        type_col = df.columns[2]  # Type column
+                        
+                        # Create filter pills for type
+                        st.markdown("""
+                        <style>
+                        .type-filter {
+                            display: flex;
+                            gap: 12px;
+                            margin-bottom: 1.5rem;
+                        }
+                        </style>
+                        """, unsafe_allow_html=True)
+                        
+                        col_type, col_search, col_filter = st.columns([1, 2, 1])
+                        
+                        with col_type:
+                            type_options = ['All', 'Tools', 'Equipment']
+                            selected_type = st.selectbox("Type", options=type_options, key=f"type_{station_value}", label_visibility="collapsed")
                         
                         with col_search:
                             search_term = st.text_input("Search", placeholder="Search assets...", key=f"search_{station_value}", label_visibility="collapsed")
                         
                         with col_filter:
                             asset_names = ['All'] + sorted(station_df[asset_name_col].unique().tolist())
-                            selected_asset = st.selectbox("Filter", options=asset_names, key=f"filter_{station_value}", label_visibility="collapsed")
+                            selected_asset = st.selectbox("Asset", options=asset_names, key=f"filter_{station_value}", label_visibility="collapsed")
                         
                         filtered = station_df.copy()
                         
+                        # Apply type filter
+                        if selected_type != 'All':
+                            filtered = filtered[filtered[type_col].str.contains(selected_type, case=False, na=False)]
+                        
+                        # Apply asset name filter
                         if selected_asset != 'All':
                             filtered = filtered[filtered[asset_name_col] == selected_asset]
                         
+                        # Apply search filter
                         if search_term:
                             mask = filtered[asset_name_col].str.contains(search_term, case=False, na=False)
                             filtered = filtered[mask]
@@ -357,7 +381,7 @@ if credentials:
                                             display: flex;
                                             flex-direction: column;
                                             justify-content: space-between;
-                                            margin-bottom: 90px;
+                                            margin-bottom: 20px;
                                         "
                                         onmouseover="this.style.boxShadow='0 8px 16px rgba(0,0,0,0.12)'; this.style.transform='translateY(-4px)';"
                                         onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';">
