@@ -352,19 +352,19 @@ if credentials:
                                                 <div style="
                                                     background: white;
                                                     border: 1px solid #f0f0f0;
-                                                    border-radius: 30px;
+                                                    border-radius: 12px;
                                                     padding: 1.5rem 1.25rem;
                                                     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                                                    transition: all 0.2s ease;
+                                                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                                                     cursor: pointer;
                                                     min-height: 130px;
                                                     display: flex;
                                                     flex-direction: column;
                                                     justify-content: space-between;
-                                                    margin-bottom: 90px;
+                                                    margin-bottom: 20px;
                                                 "
-                                                onmouseover="this.style.boxShadow='0 8px 16px rgba(0,0,0,0.12)'; this.style.transform='translateY(-4px)';"
-                                                onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';">
+                                                onmouseover="this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)'; this.style.transform='translateY(-6px)'; this.style.borderColor='#ddd'; this.style.background='#fafafa';"
+                                                onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)'; this.style.borderColor='#f0f0f0'; this.style.background='white';">
                                                     <div>
                                                         <div style="
                                                             font-size: 18px;
