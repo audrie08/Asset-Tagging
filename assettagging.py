@@ -353,7 +353,7 @@ if credentials:
                                                 .asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')} {{
                                                     background: white;
                                                     border: 1px solid #f0f0f0;
-                                                    border-radius: 12px;
+                                                    border-radius:20px;
                                                     padding: 1.5rem 1.25rem;
                                                     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
                                                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -361,7 +361,7 @@ if credentials:
                                                     display: flex;
                                                     flex-direction: column;
                                                     justify-content: space-between;
-                                                    margin-bottom: 20px;
+                                                    margin-bottom: 90px;
                                                 }}
                                                 .asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')}:hover {{
                                                     box-shadow: 0 12px 24px rgba(0,0,0,0.15);
@@ -403,7 +403,7 @@ if credentials:
                                                 .element-container:has(> .stButton) {
                                                     position: relative;
                                                     margin-top: -170px;
-                                                    margin-bottom: 20px;
+                                                    margin-bottom: 90px;
                                                     z-index: 10;
                                                 }
                                                 .element-container:has(> .stButton) button {
