@@ -89,25 +89,24 @@ st.markdown("""
         border: 1px solid #e0e0e0;
     }
     
-    /* Buttons - make them look like cards */
+    /* Buttons - styled as view/action buttons */
     .stButton > button {
-        background: white !important;
+        background: transparent !important;
         border: 1px solid #e0e0e0 !important;
-        border-radius: 8px !important;
-        padding: 1.25rem !important;
-        text-align: left !important;
-        font-size: 14px !important;
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        text-align: center !important;
+        font-size: 13px !important;
         font-weight: 500 !important;
-        color: #1a1a1a !important;
+        color: #666 !important;
         transition: all 0.2s ease !important;
         height: auto !important;
-        min-height: 120px !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+        margin-top: 8px !important;
     }
     .stButton > button:hover {
+        background: #fafafa !important;
         border-color: #999 !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-        transform: translateY(-2px) !important;
+        color: #1a1a1a !important;
     }
     
     /* Download button */
@@ -344,10 +343,38 @@ if credentials:
                                         color = get_avatar_color(asset_name)
                                         count = len(group_df)
                                         
-                                        # Single clickable button styled as a card
-                                        button_label = f"{asset_name}\n{count} items"
+                                        # Create metric-style card with HTML
+                                        st.markdown(f"""
+                                        <div style="
+                                            background: white;
+                                            border: 1px solid #f0f0f0;
+                                            border-radius: 12px;
+                                            padding: 1.5rem 1.25rem;
+                                            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                                            transition: all 0.2s ease;
+                                            min-height: 110px;
+                                            display: flex;
+                                            flex-direction: column;
+                                            justify-content: center;
+                                        ">
+                                            <div style="
+                                                font-size: 32px;
+                                                font-weight: 600;
+                                                color: #1a1a1a;
+                                                line-height: 1;
+                                                margin-bottom: 8px;
+                                            ">{count}</div>
+                                            <div style="
+                                                font-size: 14px;
+                                                font-weight: 500;
+                                                color: #666;
+                                                line-height: 1.4;
+                                            ">{asset_name}</div>
+                                        </div>
+                                        """, unsafe_allow_html=True)
                                         
-                                        if st.button(button_label, key=f"{station_key}_{asset_name}", use_container_width=True):
+                                        # Hidden button for functionality
+                                        if st.button("View Details", key=f"{station_key}_{asset_name}", use_container_width=True):
                                             st.session_state[f'modal_{station_key}'] = asset_name
                                             st.session_state[f'modal_data_{station_key}'] = group_df
                                             st.rerun()
