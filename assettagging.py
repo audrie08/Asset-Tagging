@@ -352,7 +352,7 @@ if credentials:
                                                 <div style="
                                                     background: white;
                                                     border: 1px solid #f0f0f0;
-                                                    border-radius: 12px;
+                                                    border-radius: 20px;
                                                     padding: 1.5rem 1.25rem;
                                                     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
                                                     transition: all 0.2s ease;
