@@ -307,33 +307,18 @@ if credentials:
                                     st.markdown("**Status**")
                                     st.write(row.get(df.columns[11], "N/A"))
                     else:
-                        # Card grid view
-                        # Type filter (Tools or Equipment)
+                        # Card grid view with Type and Asset Name filters
                         type_col = df.columns[2]  # Type column
                         
-                        # Create filter pills for type
-                        st.markdown("""
-                        <style>
-                        .type-filter {
-                            display: flex;
-                            gap: 12px;
-                            margin-bottom: 1.5rem;
-                        }
-                        </style>
-                        """, unsafe_allow_html=True)
-                        
-                        col_type, col_search, col_filter = st.columns([1, 2, 1])
+                        col_type, col_asset = st.columns([1, 1])
                         
                         with col_type:
                             type_options = ['All', 'Tools', 'Equipment']
-                            selected_type = st.selectbox("Type", options=type_options, key=f"type_{station_value}", label_visibility="collapsed")
+                            selected_type = st.selectbox("Filter by Type", options=type_options, key=f"type_{station_value}")
                         
-                        with col_search:
-                            search_term = st.text_input("Search", placeholder="Search assets...", key=f"search_{station_value}", label_visibility="collapsed")
-                        
-                        with col_filter:
+                        with col_asset:
                             asset_names = ['All'] + sorted(station_df[asset_name_col].unique().tolist())
-                            selected_asset = st.selectbox("Asset", options=asset_names, key=f"filter_{station_value}", label_visibility="collapsed")
+                            selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}")
                         
                         filtered = station_df.copy()
                         
@@ -344,11 +329,6 @@ if credentials:
                         # Apply asset name filter
                         if selected_asset != 'All':
                             filtered = filtered[filtered[asset_name_col] == selected_asset]
-                        
-                        # Apply search filter
-                        if search_term:
-                            mask = filtered[asset_name_col].str.contains(search_term, case=False, na=False)
-                            filtered = filtered[mask]
                         
                         st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
