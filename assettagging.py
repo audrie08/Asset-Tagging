@@ -307,117 +307,116 @@ if credentials:
                                     st.markdown("**Status**")
                                     st.write(row.get(df.columns[11], "N/A"))
                     else:
-                        # Card grid view with Type and Asset Name filters
+                        # Card grid view with Type tabs and Asset Name filter
                         type_col = df.columns[2]  # Type column
                         
-                        col_type, col_asset = st.columns([1, 1])
+                        # Create tabs for type filtering
+                        type_options = ['All', 'Tools', 'Equipment']
+                        type_tabs = st.tabs(type_options)
                         
-                        with col_type:
-                            type_options = ['All', 'Tools', 'Equipment']
-                            selected_type = st.selectbox("Filter by Type", options=type_options, key=f"type_{station_value}")
-                        
-                        # Filter by type first, then populate asset names based on filtered results
-                        filtered = station_df.copy()
-                        
-                        if selected_type != 'All':
-                            filtered = filtered[filtered[type_col].str.contains(selected_type, case=False, na=False)]
-                        
-                        with col_asset:
-                            # Get asset names from the type-filtered data
-                            asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
-                            selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}")
-                        
-                        # Apply asset name filter on already type-filtered data
-                        if selected_asset != 'All':
-                            filtered = filtered[filtered[asset_name_col] == selected_asset]
-                        
-                        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
-                        
-                        if not filtered.empty:
-                            grouped = filtered.groupby(asset_name_col)
-                            asset_groups = list(grouped)
-                            
-                            num_cols = 4
-                            for i in range(0, len(asset_groups), num_cols):
-                                cols = st.columns(num_cols)
-                                batch = asset_groups[i:i + num_cols]
+                        for type_tab, type_option in zip(type_tabs, type_options):
+                            with type_tab:
+                                # Filter by type
+                                filtered = station_df.copy()
                                 
-                                for col_idx, (asset_name, group_df) in enumerate(batch):
-                                    with cols[col_idx]:
-                                        initial = asset_name[0].upper()
-                                        color = get_avatar_color(asset_name)
-                                        count = len(group_df)
+                                if type_option != 'All':
+                                    filtered = filtered[filtered[type_col].str.contains(type_option, case=False, na=False)]
+                                
+                                # Asset name filter dropdown
+                                asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
+                                selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}_{type_option}")
+                                
+                                # Apply asset name filter on already type-filtered data
+                                if selected_asset != 'All':
+                                    filtered = filtered[filtered[asset_name_col] == selected_asset]
+                                
+                                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+                                
+                                if not filtered.empty:
+                                    grouped = filtered.groupby(asset_name_col)
+                                    asset_groups = list(grouped)
+                                    
+                                    num_cols = 4
+                                    for i in range(0, len(asset_groups), num_cols):
+                                        cols = st.columns(num_cols)
+                                        batch = asset_groups[i:i + num_cols]
                                         
-                                        # Create clickable metric-style card
-                                        st.markdown(f"""
-                                        <div style="
-                                            background: white;
-                                            border: 1px solid #f0f0f0;
-                                            border-radius: 12px;
-                                            padding: 1.5rem 1.25rem;
-                                            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                                            transition: all 0.2s ease;
-                                            cursor: pointer;
-                                            min-height: 130px;
-                                            display: flex;
-                                            flex-direction: column;
-                                            justify-content: space-between;
-                                            margin-bottom: 90px;
-                                        "
-                                        onmouseover="this.style.boxShadow='0 8px 16px rgba(0,0,0,0.12)'; this.style.transform='translateY(-4px)';"
-                                        onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';">
-                                            <div>
+                                        for col_idx, (asset_name, group_df) in enumerate(batch):
+                                            with cols[col_idx]:
+                                                initial = asset_name[0].upper()
+                                                color = get_avatar_color(asset_name)
+                                                count = len(group_df)
+                                                
+                                                # Create clickable metric-style card
+                                                st.markdown(f"""
                                                 <div style="
-                                                    font-size: 18px;
-                                                    font-weight: 600;
-                                                    color: #1a1a1a;
-                                                    line-height: 1.3;
-                                                    margin-bottom: 8px;
-                                                ">{asset_name}</div>
-                                                <div style="
-                                                    font-size: 13px;
-                                                    font-weight: 500;
-                                                    color: #999;
-                                                    line-height: 1.4;
-                                                ">{count} items</div>
-                                            </div>
-                                            <div style="
-                                                margin-top: 16px;
-                                                padding-top: 12px;
-                                                border-top: 1px solid #f5f5f5;
-                                                font-size: 13px;
-                                                font-weight: 500;
-                                                color: #666;
-                                            ">View Details →</div>
-                                        </div>
-                                        """, unsafe_allow_html=True)
-                                        
-                                        # Invisible button for functionality that fills the space
-                                        st.markdown("""
-                                        <style>
-                                        .element-container:has(> .stButton) {
-                                            position: relative;
-                                            margin-top: -170px;
-                                            margin-bottom: 20px;
-                                            z-index: 10;
-                                        }
-                                        .element-container:has(> .stButton) button {
-                                            width: 100%;
-                                            height: 150px;
-                                            opacity: 0;
-                                            cursor: pointer;
-                                            margin: 0;
-                                            padding: 0;
-                                        }
-                                        </style>
-                                        """, unsafe_allow_html=True)
-                                        
-                                        if st.button("click", key=f"{station_key}_{asset_name}", use_container_width=True):
-                                            st.session_state[f'modal_{station_key}'] = asset_name
-                                            st.session_state[f'modal_data_{station_key}'] = group_df
-                                            st.rerun()
-                        else:
-                            st.info("No assets found")
+                                                    background: white;
+                                                    border: 1px solid #f0f0f0;
+                                                    border-radius: 12px;
+                                                    padding: 1.5rem 1.25rem;
+                                                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                                                    transition: all 0.2s ease;
+                                                    cursor: pointer;
+                                                    min-height: 130px;
+                                                    display: flex;
+                                                    flex-direction: column;
+                                                    justify-content: space-between;
+                                                    margin-bottom: 20px;
+                                                "
+                                                onmouseover="this.style.boxShadow='0 8px 16px rgba(0,0,0,0.12)'; this.style.transform='translateY(-4px)';"
+                                                onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';">
+                                                    <div>
+                                                        <div style="
+                                                            font-size: 18px;
+                                                            font-weight: 600;
+                                                            color: #1a1a1a;
+                                                            line-height: 1.3;
+                                                            margin-bottom: 8px;
+                                                        ">{asset_name}</div>
+                                                        <div style="
+                                                            font-size: 13px;
+                                                            font-weight: 500;
+                                                            color: #999;
+                                                            line-height: 1.4;
+                                                        ">{count} items</div>
+                                                    </div>
+                                                    <div style="
+                                                        margin-top: 16px;
+                                                        padding-top: 12px;
+                                                        border-top: 1px solid #f5f5f5;
+                                                        font-size: 13px;
+                                                        font-weight: 500;
+                                                        color: #666;
+                                                    ">View Details →</div>
+                                                </div>
+                                                """, unsafe_allow_html=True)
+                                                
+                                                # Invisible button for functionality that fills the space
+                                                st.markdown("""
+                                                <style>
+                                                .element-container:has(> .stButton) {
+                                                    position: relative;
+                                                    margin-top: -170px;
+                                                    margin-bottom: 20px;
+                                                    z-index: 10;
+                                                }
+                                                .element-container:has(> .stButton) button {
+                                                    width: 100%;
+                                                    height: 150px;
+                                                    opacity: 0;
+                                                    cursor: pointer;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                }
+                                                </style>
+                                                """, unsafe_allow_html=True)
+                                                
+                                                if st.button("click", key=f"{station_key}_{type_option}_{asset_name}", use_container_width=True):
+                                                    st.session_state[f'modal_{station_key}'] = asset_name
+                                                    st.session_state[f'modal_data_{station_key}'] = group_df
+                                                    st.rerun()
+                                else:
+                                    st.info("No assets found")
                     
                     # Download button
                     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
