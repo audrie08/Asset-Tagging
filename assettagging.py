@@ -109,20 +109,6 @@ st.markdown("""
         color: #1a1a1a !important;
     }
     
-    /* Download button */
-    .stDownloadButton > button {
-        background: #1a1a1a !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 10px 20px !important;
-        font-weight: 500 !important;
-        border: none !important;
-        font-size: 14px !important;
-    }
-    .stDownloadButton > button:hover {
-        background: #333 !important;
-    }
-    
     /* Expander styling */
     .streamlit-expanderHeader {
         background: white !important;
@@ -131,7 +117,7 @@ st.markdown("""
         padding: 14px 18px !important;
         font-weight: 500 !important;
         font-size: 14px !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 30px !important;
     }
     .streamlit-expanderHeader:hover {
         border-color: #999 !important;
