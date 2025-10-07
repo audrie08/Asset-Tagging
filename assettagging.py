@@ -357,7 +357,7 @@ if credentials:
                                             display: flex;
                                             flex-direction: column;
                                             justify-content: space-between;
-                                            margin-bottom: 40px;
+                                            margin-bottom: 60px;
                                         "
                                         onmouseover="this.style.boxShadow='0 8px 16px rgba(0,0,0,0.12)'; this.style.transform='translateY(-4px)';"
                                         onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';">
