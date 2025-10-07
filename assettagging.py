@@ -117,7 +117,9 @@ st.markdown("""
         padding: 14px 18px !important;
         font-weight: 500 !important;
         font-size: 14px !important;
-        margin-bottom: 30px !important;
+        margin-bottom: 12px !important;
+        margin-top: 50px !important;
+
     }
     .streamlit-expanderHeader:hover {
         border-color: #999 !important;
