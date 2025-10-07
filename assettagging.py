@@ -89,7 +89,7 @@ st.markdown("""
         border: 1px solid #e0e0e0;
     }
     
-    /* Buttons - styled as view/action buttons */
+    /* Buttons */
     .stButton > button {
         background: transparent !important;
         border: 1px solid #e0e0e0 !important;
@@ -343,67 +343,53 @@ if credentials:
                                         
                                         for col_idx, (asset_name, group_df) in enumerate(batch):
                                             with cols[col_idx]:
-                                                initial = asset_name[0].upper()
-                                                color = get_avatar_color(asset_name)
                                                 count = len(group_df)
+                                                safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
                                                 # Create clickable metric-style card with CSS hover
                                                 st.markdown(f"""
                                                 <style>
-                                                .asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')} {{
+                                                .card-{safe_name} {{
                                                     background: white;
                                                     border: 1px solid #f0f0f0;
-                                                    border-radius:20px;
+                                                    border-radius: 20px;
                                                     padding: 1.5rem 1.25rem;
                                                     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                                                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                                    transition: all 0.3s ease;
                                                     min-height: 130px;
                                                     display: flex;
                                                     flex-direction: column;
                                                     justify-content: space-between;
                                                     margin-bottom: 90px;
                                                 }}
-                                                .asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')}:hover {{
+                                                .card-{safe_name}:hover {{
                                                     box-shadow: 0 12px 24px rgba(0,0,0,0.15);
                                                     transform: translateY(-6px);
-                                                    border-color: #ddd;
-                                                    background: #fafafa;
+                                                    border-color: #ccc;
                                                 }}
                                                 </style>
-                                                <div class="asset-card-{station_key.replace(' ', '-')}_{asset_name.replace(' ', '-').replace('/', '-')}">
+                                                <div class="card-{safe_name}">
                                                     <div>
-                                                        <div style="
-                                                            font-size: 18px;
-                                                            font-weight: 600;
-                                                            color: #1a1a1a;
-                                                            line-height: 1.3;
-                                                            margin-bottom: 8px;
-                                                        ">{asset_name}</div>
-                                                        <div style="
-                                                            font-size: 13px;
-                                                            font-weight: 500;
-                                                            color: #999;
-                                                            line-height: 1.4;
-                                                        ">{count} items</div>
+                                                        <div style="font-size: 18px; font-weight: 600; color: #1a1a1a; line-height: 1.3; margin-bottom: 8px;">
+                                                            {asset_name}
+                                                        </div>
+                                                        <div style="font-size: 13px; font-weight: 500; color: #999; line-height: 1.4;">
+                                                            {count} items
+                                                        </div>
                                                     </div>
-                                                    <div style="
-                                                        margin-top: 16px;
-                                                        padding-top: 12px;
-                                                        border-top: 1px solid #f5f5f5;
-                                                        font-size: 13px;
-                                                        font-weight: 500;
-                                                        color: #666;
-                                                    ">View Details →</div>
+                                                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #f5f5f5; font-size: 13px; font-weight: 500; color: #666;">
+                                                        View Details →
+                                                    </div>
                                                 </div>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                # Invisible button for functionality - now with pointer-events to allow hover
+                                                # Button positioned over the card
                                                 st.markdown("""
                                                 <style>
                                                 .element-container:has(> .stButton) {
                                                     position: relative;
                                                     margin-top: -170px;
-                                                    margin-bottom: 90px;
+                                                    margin-bottom: 20px;
                                                     z-index: 10;
                                                 }
                                                 .element-container:has(> .stButton) button {
@@ -413,12 +399,11 @@ if credentials:
                                                     cursor: pointer;
                                                     margin: 0;
                                                     padding: 0;
-                                                    pointer-events: all;
                                                 }
                                                 </style>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                if st.button("click", key=f"{station_key}_{type_option}_{asset_name}", use_container_width=True):
+                                                if st.button("c", key=f"{safe_name}_{asset_name}", use_container_width=True):
                                                     st.session_state[f'modal_{station_key}'] = asset_name
                                                     st.session_state[f'modal_data_{station_key}'] = group_df
                                                     st.rerun()
