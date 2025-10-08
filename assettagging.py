@@ -193,21 +193,8 @@ st.markdown("""
         background: white;
     }
     
-    /* Color variations for cards */
-    .card-yellow .asset-card-header {
-        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
-    }
-    
     .card-dark .asset-card-header {
         background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
-    }
-    
-    .card-gray .asset-card-header {
-        background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
-    }
-    
-    .card-amber .asset-card-header {
-        background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     }
     
     .asset-name {
