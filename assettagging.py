@@ -12,127 +12,291 @@ st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .block-container {padding: 2rem 3rem;}
+    
+    /* Main container styling */
+    .block-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+    
+    /* Header Section - Yellow Background */
+    .main > div:first-child {
+        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+        border-bottom: 4px solid #1a1a1a;
+        padding: 2.5rem 3rem !important;
+        margin: 0 !important;
+    }
+    
     [data-testid="column"] {padding: 0 8px;}
     
     /* Header styling */
     .header-title {
-        font-size: 28px;
-        font-weight: 600;
+        font-size: 32px;
+        font-weight: 700;
         color: #1a1a1a;
         margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     .header-subtitle {
         font-size: 14px;
-        color: #999;
-        margin-bottom: 2rem;
+        color: #333;
+        font-weight: 500;
+        margin-bottom: 0;
     }
     
-    /* Tabs */
+    /* Content padding */
+    .content-wrapper {
+        padding: 2rem 3rem;
+    }
+    
+    /* Tabs - Gray Container with Black Active */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 0;
-        background: transparent;
-        border-bottom: 2px solid #f0f0f0;
+        gap: 0.5rem;
+        background: #e0e0e0;
+        padding: 0.5rem;
+        border-radius: 12px;
+        border: none;
         margin-bottom: 2rem;
     }
     .stTabs [data-baseweb="tab"] {
         height: 48px;
-        padding: 0 20px;
-        font-weight: 500;
+        padding: 0 24px;
+        font-weight: 600;
         font-size: 14px;
         color: #666;
         border: none;
         background: transparent;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -2px;
+        border-radius: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .stTabs [data-baseweb="tab"]:hover {
+        background: #ccc;
         color: #1a1a1a;
     }
     .stTabs [aria-selected="true"] {
-        color: #1a1a1a;
-        border-bottom-color: #1a1a1a;
-        background: transparent;
+        background: #1a1a1a !important;
+        color: #FFD700 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
     
-    /* Metrics */
+    /* Metrics - Black Background with Yellow Values */
     [data-testid="stMetric"] {
-        background: white;
-        padding: 1.25rem;
-        border-radius: 8px;
-        border: 1px solid #f0f0f0;
+        background: #1a1a1a;
+        padding: 2rem 1.5rem;
+        border-radius: 12px;
+        border: 3px solid #FFD700;
+        position: relative;
+        overflow: hidden;
+    }
+    [data-testid="stMetric"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: #FFD700;
+    }
+    [data-testid="stMetric"]:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(255, 215, 0, 0.4);
+        border-color: #FFA500;
     }
     [data-testid="stMetricValue"] {
-        font-size: 28px;
-        font-weight: 600;
-        color: #1a1a1a;
+        font-size: 36px;
+        font-weight: 700;
+        color: #FFD700;
     }
     [data-testid="stMetricLabel"] {
         font-size: 13px;
-        font-weight: 500;
-        color: #666;
+        font-weight: 600;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
-    /* Input fields */
-    .stTextInput > div > div > input {
-        border-radius: 6px;
-        border: 1px solid #e0e0e0;
-        padding: 10px 14px;
-        font-size: 14px;
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
+        margin-bottom: 2rem;
     }
-    .stTextInput > div > div > input:focus {
-        border-color: #999;
-        box-shadow: none;
-    }
+    
+    /* Input fields - Black borders */
     .stSelectbox > div > div {
-        border-radius: 6px;
-        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        border: 2px solid #1a1a1a !important;
+    }
+    .stSelectbox > div > div:hover,
+    .stSelectbox > div > div:focus-within {
+        border-color: #FFD700 !important;
+        box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.2);
+    }
+    .stSelectbox label {
+        font-weight: 600 !important;
+        color: #1a1a1a !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 14px !important;
     }
     
-    /* Buttons */
+    /* Buttons - Yellow Background */
     .stButton > button {
-        background: transparent !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 6px !important;
-        padding: 8px 16px !important;
+        background: #FFD700 !important;
+        border: 3px solid #1a1a1a !important;
+        border-radius: 8px !important;
+        padding: 12px 24px !important;
         text-align: center !important;
-        font-size: 13px !important;
-        font-weight: 500 !important;
-        color: #666 !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        color: #1a1a1a !important;
         transition: all 0.2s ease !important;
         height: auto !important;
         margin-top: 8px !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .stButton > button:hover {
-        background: #fafafa !important;
-        border-color: #999 !important;
-        color: #1a1a1a !important;
+        background: #1a1a1a !important;
+        border-color: #FFD700 !important;
+        color: #FFD700 !important;
+        box-shadow: 0 4px 16px rgba(255, 215, 0, 0.4) !important;
     }
     
-    /* Expander styling */
+    /* Expander styling - Black header with Yellow accents */
     .streamlit-expanderHeader {
-        background: white !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 8px !important;
-        padding: 14px 18px !important;
-        font-weight: 500 !important;
-        font-size: 14px !important;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+        border: 3px solid #1a1a1a !important;
+        border-radius: 12px !important;
+        padding: 16px 20px !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
         margin-bottom: 12px !important;
-        margin-top: 50px !important;
-
+        color: white !important;
     }
     
     .streamlit-expanderHeader:hover {
-        border-color: #999 !important;
+        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%) !important;
+        color: #1a1a1a !important;
+        border-color: #FFD700 !important;
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.2) !important;
     }
+    
     [data-testid="stExpander"] {
         border: none !important;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
     }
+    
     .streamlit-expanderContent {
-        background: #fafafa !important;
+        background: #f5f5f5 !important;
         border: none !important;
-        border-radius: 0 0 8px 8px !important;
-        padding: 18px !important;
+        border-top: 3px solid #FFD700 !important;
+        padding: 20px !important;
+    }
+    
+    /* Detail items in expander */
+    .streamlit-expanderContent [data-testid="column"] > div {
+        background: white !important;
+        padding: 1rem !important;
+        border-radius: 8px !important;
+        border: 2px solid #e0e0e0 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .streamlit-expanderContent strong {
+        color: #1a1a1a !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 12px !important;
+    }
+    
+    /* Card styling */
+    .asset-card {
+        background: white;
+        border: 3px solid #1a1a1a;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+    
+    .asset-card:hover {
+        box-shadow: 0 12px 32px rgba(255, 215, 0, 0.3);
+        transform: translateY(-6px);
+        border-color: #FFD700;
+    }
+    
+    .asset-card-header {
+        background: #1a1a1a;
+        padding: 1rem 1.25rem;
+        border-bottom: 3px solid #FFD700;
+        transition: all 0.3s ease;
+    }
+    
+    .asset-card:hover .asset-card-header {
+        background: #FFD700;
+    }
+    
+    .asset-card:hover .asset-name {
+        color: #1a1a1a !important;
+    }
+    
+    .asset-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #FFD700;
+        line-height: 1.3;
+        margin: 0;
+        transition: color 0.3s ease;
+    }
+    
+    .asset-card-body {
+        padding: 1.25rem;
+    }
+    
+    .asset-count {
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+    
+    .asset-footer {
+        padding-top: 1rem;
+        border-top: 2px solid #f0f0f0;
+        font-size: 13px;
+        font-weight: 700;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: color 0.2s ease;
+    }
+    
+    .asset-card:hover .asset-footer {
+        color: #FFD700;
+    }
+    
+    /* Modal header */
+    .modal-header {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 4px solid #FFD700;
+    }
+    
+    .modal-count {
+        color: #666;
+        font-weight: 600;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -205,18 +369,12 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
-def get_avatar_color(name):
-    """Generate consistent color for avatar based on name"""
-    colors = [
-        "#8B5CF6", "#6366F1", "#3B82F6", "#06B6D4", 
-        "#10B981", "#F59E0B", "#EF4444", "#EC4899"
-    ]
-    index = sum(ord(c) for c in name) % len(colors)
-    return colors[index]
-
 # Main App
-st.markdown('<div class="header-title">Asset Tagging</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
+
+# Add spacing after header
+st.markdown('<div style="margin-bottom: 2rem;"></div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
 
@@ -262,7 +420,7 @@ if credentials:
                     # Check if modal is open
                     if f'modal_{station_key}' in st.session_state:
                         # Modal view
-                        st.markdown(f'<div style="font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 1rem;">{st.session_state[f"modal_{station_key}"]} <span style="color: #999; font-weight: 400;">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
                         if st.button("← Back", key=f"close_{station_key}"):
                             del st.session_state[f'modal_{station_key}']
@@ -335,67 +493,48 @@ if credentials:
                                                 count = len(group_df)
                                                 safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
-                                                # Create clickable metric-style card with CSS hover
+                                                # Create clickable card
                                                 st.markdown(f"""
-                                                <style>
-                                                .card-{safe_name} {{
-                                                    background: white;
-                                                    border: 1px solid #f0f0f0;
-                                                    border-radius: 20px;
-                                                    padding: 1.5rem 1.25rem;
-                                                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                                                    transition: all 0.3s ease;
-                                                    min-height: 130px;
-                                                    display: flex;
-                                                    flex-direction: column;
-                                                    justify-content: space-between;
-                                                    margin-bottom: 90px;
-                                                }}
-                                                .card-{safe_name}:hover {{
-                                                    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-                                                    transform: translateY(-6px);
-                                                    border-color: #ccc;
-                                                }}
-                                                </style>
-                                                <div class="card-{safe_name}">
-                                                    <div>
-                                                        <div style="font-size: 18px; font-weight: 600; color: #1a1a1a; line-height: 1.3; margin-bottom: 8px;">
-                                                            {asset_name}
-                                                        </div>
-                                                        <div style="font-size: 13px; font-weight: 500; color: #999; line-height: 1.4;">
-                                                            {count} items
-                                                        </div>
+                                                <div class="asset-card">
+                                                    <div class="asset-card-header">
+                                                        <div class="asset-name">{asset_name}</div>
                                                     </div>
-                                                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #f5f5f5; font-size: 13px; font-weight: 500; color: #666;">
-                                                        View Details →
+                                                    <div class="asset-card-body">
+                                                        <div class="asset-count">{count} items</div>
+                                                        <div class="asset-footer">View Details →</div>
                                                     </div>
                                                 </div>
                                                 """, unsafe_allow_html=True)
                                                 
                                                 # Button positioned over the card
-                                                st.markdown("""
+                                                st.markdown(f"""
                                                 <style>
-                                                .element-container:has(> .stButton) {
+                                                .card-button-{safe_name} {{
                                                     position: relative;
-                                                    margin-top: -170px;
-                                                    margin-bottom: 90px;
+                                                    margin-top: -220px;
+                                                    margin-bottom: 0;
                                                     z-index: 10;
-                                                }
-                                                .element-container:has(> .stButton) button {
+                                                }}
+                                                .card-button-{safe_name} button {{
                                                     width: 100%;
-                                                    height: 150px;
+                                                    height: 200px;
                                                     opacity: 0;
                                                     cursor: pointer;
-                                                    margin: 0;
-                                                    padding: 0;
-                                                }
+                                                    margin: 0 !important;
+                                                    padding: 0 !important;
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                }}
                                                 </style>
+                                                <div class="card-button-{safe_name}">
                                                 """, unsafe_allow_html=True)
                                                 
                                                 if st.button("c", key=f"{safe_name}_{asset_name}", use_container_width=True):
                                                     st.session_state[f'modal_{station_key}'] = asset_name
                                                     st.session_state[f'modal_data_{station_key}'] = group_df
                                                     st.rerun()
+                                                
+                                                st.markdown("</div>", unsafe_allow_html=True)
                                 else:
                                     st.info("No assets found")
     else:
