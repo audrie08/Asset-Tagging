@@ -50,7 +50,7 @@ st.markdown("""
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #1a1a1a;
-        background: #e8e8e8;
+        background: #595750;
     }
     .stTabs [aria-selected="true"] {
         color: #FFD700;
