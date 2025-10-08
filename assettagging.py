@@ -169,7 +169,7 @@ st.markdown("""
     /* Card styling - Colorful with Yellow/Gray variations */
     .asset-card {
         background: white;
-        border: 1px solid #e8e8e8;
+        border: 2px solid #999;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
@@ -193,8 +193,21 @@ st.markdown("""
         background: white;
     }
     
+    /* Color variations for cards */
+    .card-yellow .asset-card-header {
+        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+    }
+    
     .card-dark .asset-card-header {
         background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+    }
+    
+    .card-gray .asset-card-header {
+        background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+    }
+    
+    .card-amber .asset-card-header {
+        background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     }
     
     .asset-name {
@@ -433,11 +446,10 @@ if credentials:
                                                 count = len(group_df)
                                                 safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
-                                                # Assign color based on index for variety
-                                                colors = ['card-dark']
-                                                card_color = colors[col_idx % len(colors)]
+                                                # All cards use dark/black color
+                                                card_color = 'card-dark'
                                                 
-                                                # Create clickable card with colored header
+                                                # Create clickable card with black header
                                                 st.markdown(f"""
                                                 <div class="asset-card {card_color}">
                                                     <div class="asset-card-header">
