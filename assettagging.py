@@ -57,19 +57,36 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Metrics - White with Yellow accent */
+    /* Metrics - White with Colored accents */
     [data-testid="stMetric"] {
         background: white;
         padding: 1.5rem;
         border-radius: 10px;
         border: 1px solid #e8e8e8;
-        border-left: 4px solid #FFD700;
+        position: relative;
+        overflow: hidden;
         transition: all 0.2s ease;
+    }
+    [data-testid="stMetric"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+    [data-testid="stMetric"]:nth-child(1)::before {
+        background: linear-gradient(90deg, #FFD700, #FFC107);
+    }
+    [data-testid="stMetric"]:nth-child(2)::before {
+        background: linear-gradient(90deg, #9e9e9e, #757575);
+    }
+    [data-testid="stMetric"]:nth-child(3)::before {
+        background: linear-gradient(90deg, #4a4a4a, #2d2d2d);
     }
     [data-testid="stMetric"]:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-        border-left-color: #FFA500;
     }
     [data-testid="stMetricValue"] {
         font-size: 28px;
@@ -149,45 +166,69 @@ st.markdown("""
         padding: 18px !important;
     }
     
-    /* Card styling - Clean with Yellow hover */
+    /* Card styling - Colorful with Yellow/Gray variations */
     .asset-card {
         background: white;
         border: 1px solid #e8e8e8;
         border-radius: 12px;
-        padding: 1.5rem 1.25rem;
+        overflow: hidden;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         transition: all 0.3s ease;
         min-height: 150px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
         margin-bottom: 1.5rem;
     }
     
     .asset-card:hover {
-        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.2);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         transform: translateY(-4px);
-        border-color: #FFD700;
+    }
+    
+    .asset-card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .asset-card-body {
+        padding: 1.25rem;
+        background: white;
+    }
+    
+    /* Color variations for cards */
+    .card-yellow .asset-card-header {
+        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+    }
+    
+    .card-dark .asset-card-header {
+        background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+    }
+    
+    .card-gray .asset-card-header {
+        background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+    }
+    
+    .card-amber .asset-card-header {
+        background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     }
     
     .asset-name {
         font-size: 18px;
         font-weight: 600;
-        color: #1a1a1a;
+        color: white;
         line-height: 1.3;
-        margin-bottom: 8px;
+        margin: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
     
     .asset-count {
         font-size: 13px;
         font-weight: 500;
-        color: #999;
+        color: #666;
         line-height: 1.4;
+        margin-bottom: 1rem;
     }
     
     .asset-footer {
-        margin-top: 16px;
-        padding-top: 12px;
+        padding-top: 1rem;
         border-top: 1px solid #f5f5f5;
         font-size: 13px;
         font-weight: 500;
@@ -405,14 +446,20 @@ if credentials:
                                                 count = len(group_df)
                                                 safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
-                                                # Create clickable card
+                                                # Assign color based on index for variety
+                                                colors = ['card-yellow', 'card-dark', 'card-gray', 'card-amber']
+                                                card_color = colors[col_idx % len(colors)]
+                                                
+                                                # Create clickable card with colored header
                                                 st.markdown(f"""
-                                                <div class="asset-card">
-                                                    <div>
+                                                <div class="asset-card {card_color}">
+                                                    <div class="asset-card-header">
                                                         <div class="asset-name">{asset_name}</div>
-                                                        <div class="asset-count">{count} items</div>
                                                     </div>
-                                                    <div class="asset-footer">View Details →</div>
+                                                    <div class="asset-card-body">
+                                                        <div class="asset-count">{count} items</div>
+                                                        <div class="asset-footer">View Details →</div>
+                                                    </div>
                                                 </div>
                                                 """, unsafe_allow_html=True)
                                                 
@@ -421,13 +468,13 @@ if credentials:
                                                 <style>
                                                 .element-container:has(> .stButton) {
                                                     position: relative;
-                                                    margin-top: -180px;
-                                                    margin-bottom: 90px;
+                                                    margin-top: -200px;
+                                                    margin-bottom: 20px;
                                                     z-index: 10;
                                                 }
                                                 .element-container:has(> .stButton) button {
                                                     width: 100%;
-                                                    height: 180px;
+                                                    height: 200px;
                                                     opacity: 0;
                                                     cursor: pointer;
                                                     margin: 0;
