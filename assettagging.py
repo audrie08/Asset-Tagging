@@ -493,50 +493,55 @@ if credentials:
                                                 count = len(group_df)
                                                 safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
-                                                # Create clickable card with button wrapper
+                                                # Create clickable card
+                                                st.markdown(f"""
+                                                <div class="asset-card" id="card-{safe_name}">
+                                                    <div class="asset-card-header">
+                                                        <div class="asset-name">{asset_name}</div>
+                                                    </div>
+                                                    <div class="asset-card-body">
+                                                        <div class="asset-count">{count} items</div>
+                                                        <div class="asset-footer">View Details →</div>
+                                                    </div>
+                                                </div>
+                                                """, unsafe_allow_html=True)
+                                                
+                                                # Invisible button overlay
                                                 st.markdown(f"""
                                                 <style>
-                                                .card-wrapper-{safe_name} {{
-                                                    position: relative;
-                                                    margin-bottom: 1.5rem;
+                                                #card-{safe_name} ~ div.stButton {{
+                                                    position: absolute !important;
+                                                    top: 0 !important;
+                                                    left: 8px !important;
+                                                    right: 8px !important;
+                                                    width: calc(100% - 16px) !important;
+                                                    height: 100% !important;
+                                                    margin: -220px 0 0 0 !important;
+                                                    z-index: 10 !important;
                                                 }}
-                                                .card-wrapper-{safe_name} .stButton {{
-                                                    position: absolute;
-                                                    top: 0;
-                                                    left: 0;
-                                                    width: 100%;
-                                                    height: 100%;
-                                                    z-index: 10;
-                                                }}
-                                                .card-wrapper-{safe_name} .stButton button {{
-                                                    width: 100%;
-                                                    height: 100%;
-                                                    opacity: 0;
-                                                    cursor: pointer;
+                                                #card-{safe_name} ~ div.stButton button {{
+                                                    width: 100% !important;
+                                                    height: 220px !important;
+                                                    opacity: 0 !important;
+                                                    cursor: pointer !important;
                                                     margin: 0 !important;
                                                     padding: 0 !important;
                                                     background: transparent !important;
                                                     border: none !important;
+                                                    box-shadow: none !important;
+                                                }}
+                                                #card-{safe_name} ~ div.stButton button:hover {{
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                    box-shadow: none !important;
                                                 }}
                                                 </style>
-                                                <div class="card-wrapper-{safe_name}">
-                                                    <div class="asset-card">
-                                                        <div class="asset-card-header">
-                                                            <div class="asset-name">{asset_name}</div>
-                                                        </div>
-                                                        <div class="asset-card-body">
-                                                            <div class="asset-count">{count} items</div>
-                                                            <div class="asset-footer">View Details →</div>
-                                                        </div>
-                                                    </div>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                if st.button("c", key=f"{safe_name}_{asset_name}", use_container_width=True):
+                                                if st.button(".", key=f"{safe_name}_{asset_name}"):
                                                     st.session_state[f'modal_{station_key}'] = asset_name
                                                     st.session_state[f'modal_data_{station_key}'] = group_df
                                                     st.rerun()
-                                                
-                                                st.markdown("</div>", unsafe_allow_html=True)
                                 else:
                                     st.info("No assets found")
     else:
