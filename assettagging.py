@@ -215,7 +215,7 @@ def get_avatar_color(name):
     return colors[index]
 
 # Main App
-st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">Asset Tagging</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
