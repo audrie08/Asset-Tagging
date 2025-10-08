@@ -36,6 +36,7 @@ st.markdown("""
         border-radius: 10px;
         border: none;
         margin-bottom: 2rem;
+        justify-content: center;
     }
     .stTabs [data-baseweb="tab"] {
         height: 48px;
@@ -48,8 +49,8 @@ st.markdown("""
         border-radius: 8px;
     }
     .stTabs [data-baseweb="tab"]:hover {
-        color: #1a1a1a;
-        background: #e8e8e8;
+        color: #FFD700;
+        background: #1a1a1a;
     }
     .stTabs [aria-selected="true"] {
         color: #1a1a1a;
@@ -468,7 +469,7 @@ if credentials:
                                                 .element-container:has(> .stButton) {
                                                     position: relative;
                                                     margin-top: -200px;
-                                                    margin-bottom: 150px;
+                                                    margin-bottom: 20px;
                                                     z-index: 10;
                                                 }
                                                 .element-container:has(> .stButton) button {
