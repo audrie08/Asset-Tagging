@@ -434,7 +434,7 @@ if credentials:
                                                 safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
                                                 # Assign color based on index for variety
-                                                colors = ['card-yellow', 'card-dark', 'card-gray', 'card-amber']
+                                                colors = ['card-dark']
                                                 card_color = colors[col_idx % len(colors)]
                                                 
                                                 # Create clickable card with colored header
