@@ -49,12 +49,12 @@ st.markdown("""
         border-radius: 8px;
     }
     .stTabs [data-baseweb="tab"]:hover {
-        color: #FFD700;
-        background: #1a1a1a;
+        color: #1a1a1a;
+        background: #e8e8e8;
     }
     .stTabs [aria-selected="true"] {
-        color: #1a1a1a;
-        background: #FFD700;
+        color: #FFD700;
+        background: #1a1a1a;
         font-weight: 600;
     }
     
