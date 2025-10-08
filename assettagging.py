@@ -512,7 +512,7 @@ if credentials:
                                                 .element-container:has(> .stButton) {
                                                     position: relative;
                                                     margin-top: -240px;
-                                                    margin-bottom: 110px;
+                                                    margin-bottom: 160px;
                                                     z-index: 10;
                                                 }
                                                 .element-container:has(> .stButton) button {
