@@ -493,47 +493,8 @@ if credentials:
                                                 count = len(group_df)
                                                 safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
-                                                # Create clickable card with invisible button
-                                                button_id = f"btn_{safe_name}_{asset_name.replace(' ', '_')}"
-                                                
+                                                # Create clickable card
                                                 st.markdown(f"""
-                                                <style>
-                                                #{button_id} {{
-                                                    position: absolute !important;
-                                                    top: 0 !important;
-                                                    left: 0 !important;
-                                                    width: 100% !important;
-                                                    height: 100% !important;
-                                                    margin: -240px 0 220px 0 !important;
-                                                    padding: 0 !important;
-                                                    z-index: 10 !important;
-                                                }}
-                                                #{button_id} button {{
-                                                    width: 100% !important;
-                                                    height: 240px !important;
-                                                    opacity: 0 !important;
-                                                    cursor: pointer !important;
-                                                    margin: 0 !important;
-                                                    padding: 0 !important;
-                                                    background: transparent !important;
-                                                    border: none !important;
-                                                    box-shadow: none !important;
-                                                    color: transparent !important;
-                                                    font-size: 0 !important;
-                                                }}
-                                                #{button_id} button:hover {{
-                                                    background: transparent !important;
-                                                    border: none !important;
-                                                    box-shadow: none !important;
-                                                    color: transparent !important;
-                                                }}
-                                                #{button_id} button:focus {{
-                                                    background: transparent !important;
-                                                    border: none !important;
-                                                    box-shadow: none !important;
-                                                    color: transparent !important;
-                                                }}
-                                                </style>
                                                 <div class="asset-card">
                                                     <div class="asset-card-header">
                                                         <div class="asset-name">{asset_name}</div>
@@ -545,15 +506,36 @@ if credentials:
                                                 </div>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                # Invisible button overlay
-                                                col_container = st.container()
-                                                col_container.markdown(f'<div id="{button_id}"></div>', unsafe_allow_html=True)
+                                                # Button positioned over the card
+                                                st.markdown("""
+                                                <style>
+                                                .element-container:has(> .stButton) {
+                                                    position: relative;
+                                                    margin-top: -240px;
+                                                    margin-bottom: 20px;
+                                                    z-index: 10;
+                                                }
+                                                .element-container:has(> .stButton) button {
+                                                    width: 100%;
+                                                    height: 240px;
+                                                    opacity: 0;
+                                                    cursor: pointer;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                }
+                                                .element-container:has(> .stButton) button:hover {
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                }
+                                                </style>
+                                                """, unsafe_allow_html=True)
                                                 
-                                                with col_container:
-                                                    if st.button(" ", key=f"{safe_name}_{asset_name}"):
-                                                        st.session_state[f'modal_{station_key}'] = asset_name
-                                                        st.session_state[f'modal_data_{station_key}'] = group_df
-                                                        st.rerun()
+                                                if st.button(" ", key=f"{safe_name}_{asset_name}", use_container_width=True):
+                                                    st.session_state[f'modal_{station_key}'] = asset_name
+                                                    st.session_state[f'modal_data_{station_key}'] = group_df
+                                                    st.rerun()
                                 else:
                                     st.info("No assets found")
     else:
