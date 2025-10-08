@@ -493,31 +493,24 @@ if credentials:
                                                 count = len(group_df)
                                                 safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
-                                                # Create clickable card
-                                                st.markdown(f"""
-                                                <div class="asset-card">
-                                                    <div class="asset-card-header">
-                                                        <div class="asset-name">{asset_name}</div>
-                                                    </div>
-                                                    <div class="asset-card-body">
-                                                        <div class="asset-count">{count} items</div>
-                                                        <div class="asset-footer">View Details →</div>
-                                                    </div>
-                                                </div>
-                                                """, unsafe_allow_html=True)
-                                                
-                                                # Button positioned over the card
+                                                # Create clickable card with button wrapper
                                                 st.markdown(f"""
                                                 <style>
-                                                .card-button-{safe_name} {{
+                                                .card-wrapper-{safe_name} {{
                                                     position: relative;
-                                                    margin-top: -220px;
-                                                    margin-bottom: 0;
+                                                    margin-bottom: 1.5rem;
+                                                }}
+                                                .card-wrapper-{safe_name} .stButton {{
+                                                    position: absolute;
+                                                    top: 0;
+                                                    left: 0;
+                                                    width: 100%;
+                                                    height: 100%;
                                                     z-index: 10;
                                                 }}
-                                                .card-button-{safe_name} button {{
+                                                .card-wrapper-{safe_name} .stButton button {{
                                                     width: 100%;
-                                                    height: 200px;
+                                                    height: 100%;
                                                     opacity: 0;
                                                     cursor: pointer;
                                                     margin: 0 !important;
@@ -526,7 +519,16 @@ if credentials:
                                                     border: none !important;
                                                 }}
                                                 </style>
-                                                <div class="card-button-{safe_name}">
+                                                <div class="card-wrapper-{safe_name}">
+                                                    <div class="asset-card">
+                                                        <div class="asset-card-header">
+                                                            <div class="asset-name">{asset_name}</div>
+                                                        </div>
+                                                        <div class="asset-card-body">
+                                                            <div class="asset-count">{count} items</div>
+                                                            <div class="asset-footer">View Details →</div>
+                                                        </div>
+                                                    </div>
                                                 """, unsafe_allow_html=True)
                                                 
                                                 if st.button("c", key=f"{safe_name}_{asset_name}", use_container_width=True):
