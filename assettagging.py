@@ -1,4 +1,4 @@
-import streamlit as st
+dimport streamlit as st
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
@@ -6,7 +6,7 @@ import warnings
 import io
 
 warnings.filterwarnings('ignore')
-st.set_page_config(page_title="Asset Tagging", layout="wide")
+st.set_page_config(page_title="Asset Tagging", layout="centered")
 
 st.markdown("""
 <style>
