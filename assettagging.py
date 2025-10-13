@@ -8,6 +8,9 @@ import io
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="Asset Tagging", layout="wide")
 
+# DEBUG MODE - Set to True to see debug info
+DEBUG_MODE = True
+
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
@@ -26,6 +29,23 @@ st.markdown("""
         font-size: 14px;
         color: #666;
         margin-bottom: 2rem;
+    }
+    
+    /* Debug styling */
+    .debug-box {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 10px 0;
+        font-family: monospace;
+        font-size: 12px;
+    }
+    
+    .debug-title {
+        font-weight: bold;
+        color: #856404;
+        margin-bottom: 5px;
     }
     
     /* Tabs - Gray background with Yellow active */
@@ -255,28 +275,6 @@ st.markdown("""
         color: #999;
         font-weight: 400;
     }
-    
-    /* Back button special styling */
-    .back-btn {
-        background: #1a1a1a;
-        color: #FFD700;
-        padding: 12px 28px;
-        border: 2px solid #1a1a1a;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-block;
-        text-decoration: none;
-        margin-bottom: 1.5rem;
-    }
-    
-    .back-btn:hover {
-        background: #2d2d2d;
-        border-color: #FFD700;
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -352,6 +350,19 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
 st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
+# DEBUG PANEL
+if DEBUG_MODE:
+    with st.expander("🐛 DEBUG PANEL - Session State", expanded=True):
+        st.write("**All Session State Keys:**")
+        modal_keys = {k: v for k, v in st.session_state.items() if 'modal' in k}
+        if modal_keys:
+            st.json(modal_keys)
+        else:
+            st.info("No modal keys in session state")
+        
+        st.write("**Full Session State:**")
+        st.write(dict(st.session_state))
+
 credentials = load_credentials()
 
 if credentials:
@@ -382,34 +393,70 @@ if credentials:
                 if not station_df.empty:
                     station_key = station_value.replace(' ', '_')
                     
+                    # DEBUG: Show current station info
+                    if DEBUG_MODE:
+                        st.markdown(f"""
+                        <div class="debug-box">
+                            <div class="debug-title">📍 Current Station: {station_value}</div>
+                            Station Key: {station_key}<br>
+                            Modal Key: modal_{station_key}<br>
+                            Modal Exists: {f'modal_{station_key}' in st.session_state}<br>
+                            Modal Value: {st.session_state.get(f'modal_{station_key}', 'None')}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
                     # Check if modal is open for this station
-                    modal_active = f'modal_{station_key}' in st.session_state and st.session_state.get(f'modal_{station_key}') is not None
+                    modal_key = f'modal_{station_key}'
+                    modal_data_key = f'modal_data_{station_key}'
+                    
+                    modal_exists = modal_key in st.session_state
+                    modal_value = st.session_state.get(modal_key)
+                    modal_active = modal_exists and modal_value is not None
+                    
+                    if DEBUG_MODE:
+                        st.info(f"🔍 Modal Active Check: {modal_active} (exists: {modal_exists}, value: {modal_value})")
                     
                     if modal_active:
                         # MODAL VIEW - Asset Details
+                        st.success("✅ MODAL VIEW MODE ACTIVE")
                         
-                        # Back button - always at the top, always visible
-                        col1, col2 = st.columns([2, 10])
-                        with col1:
-                            back_clicked = st.button(
-                                "← Back to Assets",
-                                key=f"back_button_{station_key}",
-                                type="secondary",
-                                use_container_width=True
-                            )
+                        # Back button
+                        if DEBUG_MODE:
+                            st.warning("⚠️ Rendering BACK button now...")
+                        
+                        back_clicked = st.button(
+                            "← Back to Asset List",
+                            key=f"back_button_{station_key}",
+                            type="primary",
+                            use_container_width=False
+                        )
+                        
+                        if DEBUG_MODE:
+                            st.write(f"🖱️ Back Button Clicked: {back_clicked}")
                         
                         # Process back button click
                         if back_clicked:
-                            # Delete the modal state completely
-                            if f'modal_{station_key}' in st.session_state:
-                                del st.session_state[f'modal_{station_key}']
-                            if f'modal_data_{station_key}' in st.session_state:
-                                del st.session_state[f'modal_data_{station_key}']
+                            if DEBUG_MODE:
+                                st.error("🔴 BACK BUTTON WAS CLICKED! Deleting state...")
+                            
+                            # Delete the modal state
+                            keys_to_delete = []
+                            if modal_key in st.session_state:
+                                keys_to_delete.append(modal_key)
+                                del st.session_state[modal_key]
+                            if modal_data_key in st.session_state:
+                                keys_to_delete.append(modal_data_key)
+                                del st.session_state[modal_data_key]
+                            
+                            if DEBUG_MODE:
+                                st.success(f"✅ Deleted keys: {keys_to_delete}")
+                                st.write("🔄 About to rerun...")
+                            
                             st.rerun()
                         
                         # Display modal header
-                        asset_name_display = st.session_state.get(f'modal_{station_key}', 'Asset')
-                        modal_data = st.session_state.get(f'modal_data_{station_key}', pd.DataFrame())
+                        asset_name_display = st.session_state.get(modal_key, 'Asset')
+                        modal_data = st.session_state.get(modal_data_key, pd.DataFrame())
                         
                         if not modal_data.empty:
                             st.markdown(f'<div class="modal-header">{asset_name_display} <span class="modal-count">({len(modal_data)} items)</span></div>', unsafe_allow_html=True)
@@ -441,8 +488,13 @@ if credentials:
                                         st.write(row.get(df.columns[10], "N/A"))
                                         st.markdown("**Status**")
                                         st.write(row.get(df.columns[11], "N/A"))
+                        else:
+                            st.error("⚠️ Modal data is empty!")
+                            
                     else:
                         # CARD GRID VIEW - Asset Cards
+                        st.info("📋 CARD GRID VIEW MODE ACTIVE")
+                        
                         type_col = df.columns[2]
                         
                         # Type filtering tabs
@@ -483,7 +535,7 @@ if credentials:
                                         for col_idx, (asset_name, group_df) in enumerate(batch):
                                             with cols[col_idx]:
                                                 count = len(group_df)
-                                                card_key = f"card_{station_key}_{type_option}_{i}_{col_idx}_{asset_name}"
+                                                card_key = f"card_{station_key}_{type_option}_{i}_{col_idx}"
                                                 
                                                 # Create card
                                                 st.markdown(f"""
@@ -521,9 +573,16 @@ if credentials:
                                                 """, unsafe_allow_html=True)
                                                 
                                                 # Card click handler
-                                                if st.button(" ", key=card_key, use_container_width=True):
-                                                    st.session_state[f'modal_{station_key}'] = asset_name
-                                                    st.session_state[f'modal_data_{station_key}'] = group_df
+                                                card_clicked = st.button(" ", key=card_key, use_container_width=True)
+                                                
+                                                if DEBUG_MODE and card_clicked:
+                                                    st.success(f"🖱️ Card clicked: {asset_name}")
+                                                
+                                                if card_clicked:
+                                                    st.session_state[modal_key] = asset_name
+                                                    st.session_state[modal_data_key] = group_df
+                                                    if DEBUG_MODE:
+                                                        st.write(f"✅ Set modal state: {asset_name}")
                                                     st.rerun()
                                 else:
                                     st.info("No assets found")
