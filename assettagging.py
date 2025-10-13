@@ -330,6 +330,125 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
+def render_station_content(station_df, station_key, df, asset_name_col, type_col):
+    """Render content for each station with back button"""
+    
+    # Check if modal is open - BACK BUTTON HERE
+    if f'modal_{station_key}' in st.session_state:
+        # Back button at the very top
+        if st.button("← Back to Assets", key=f"back_button_{station_key}"):
+            del st.session_state[f'modal_{station_key}']
+            del st.session_state[f'modal_data_{station_key}']
+            st.rerun()
+        
+        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
+        
+        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+        
+        for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
+            asset_number = row.get(df.columns[0], 'N/A')
+            
+            with st.expander(asset_number):
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.markdown("**Type**")
+                    st.write(row.get(df.columns[2], "N/A"))
+                    st.markdown("**Quantity**")
+                    st.write(row.get(df.columns[4], "N/A"))
+                    
+                with col2:
+                    st.markdown("**Dimensions**")
+                    dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
+                    st.write(dims)
+                    st.markdown("**Voltage**")
+                    st.write(row.get(df.columns[9], "N/A"))
+                    
+                with col3:
+                    st.markdown("**Power**")
+                    st.write(row.get(df.columns[10], "N/A"))
+                    st.markdown("**Status**")
+                    st.write(row.get(df.columns[11], "N/A"))
+    else:
+        # Card grid view with Type tabs and Asset Name filter
+        type_options = ['Tools', 'Equipment']
+        type_tabs = st.tabs(type_options)
+        
+        for type_tab, type_option in zip(type_tabs, type_options):
+            with type_tab:
+                # Filter by type
+                filtered = station_df.copy()
+                filtered = filtered[filtered[type_col].str.contains(type_option, case=False, na=False)]
+                
+                # Asset name filter dropdown
+                asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
+                selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_key}_{type_option}")
+                
+                # Apply asset name filter on already type-filtered data
+                if selected_asset != 'All':
+                    filtered = filtered[filtered[asset_name_col] == selected_asset]
+                
+                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+                
+                if not filtered.empty:
+                    grouped = filtered.groupby(asset_name_col)
+                    asset_groups = list(grouped)
+                    
+                    num_cols = 4
+                    for i in range(0, len(asset_groups), num_cols):
+                        cols = st.columns(num_cols)
+                        batch = asset_groups[i:i + num_cols]
+                        
+                        for col_idx, (asset_name, group_df) in enumerate(batch):
+                            with cols[col_idx]:
+                                count = len(group_df)
+                                safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
+                                
+                                # All cards use dark/black color
+                                card_color = 'card-dark'
+                                
+                                # Create clickable card with black header
+                                st.markdown(f"""
+                                <div class="asset-card {card_color}">
+                                    <div class="asset-card-header">
+                                        <div class="asset-name">{asset_name}</div>
+                                    </div>
+                                    <div class="asset-card-body">
+                                        <div class="asset-count">{count} items</div>
+                                        <div class="asset-footer">View Details →</div>
+                                    </div>
+                                </div>
+                                """, unsafe_allow_html=True)
+                                
+                                # Button positioned over the card
+                                st.markdown("""
+                                <style>
+                                .element-container:has(> .stButton) {
+                                    position: relative;
+                                    margin-top: -200px;
+                                    margin-bottom: 110px;
+                                    z-index: 10;
+                                }
+                                .element-container:has(> .stButton) button {
+                                    width: 100%;
+                                    height: 200px;
+                                    opacity: 0;
+                                    cursor: pointer;
+                                    margin: 0;
+                                    padding: 0;
+                                    background: transparent !important;
+                                    border: none !important;
+                                }
+                                </style>
+                                """, unsafe_allow_html=True)
+                                
+                                if st.button(" ", key=f"{safe_name}_{asset_name}", use_container_width=True):
+                                    st.session_state[f'modal_{station_key}'] = asset_name
+                                    st.session_state[f'modal_data_{station_key}'] = group_df
+                                    st.rerun()
+                else:
+                    st.info("No assets found")
+
 # Main App
 st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
@@ -347,145 +466,34 @@ if credentials:
         
         station_col = df.columns[1]
         asset_name_col = df.columns[3]
+        type_col = df.columns[2]
         
-        stations = {
-            'Hot Station': 'Hot Station',
-            'Fabrication Station': 'Fabrication Station',
-            'Pastry Station': 'Pastry Station',
-            'Packing Station': 'Packing Station'
-        }
+        # Create tabs for each station
+        tab1, tab2, tab3, tab4 = st.tabs(['Hot Station', 'Fabrication Station', 'Pastry Station', 'Packing Station'])
         
-        tabs = st.tabs(list(stations.keys()))
+        # Hot Station
+        with tab1:
+            station_df = df[df[station_col] == 'Hot Station']
+            if not station_df.empty:
+                render_station_content(station_df, 'Hot_Station', df, asset_name_col, type_col)
         
-        for tab, (tab_name, station_value) in zip(tabs, stations.items()):
-            with tab:
-                station_df = df[df[station_col] == station_value]
-                
-                if not station_df.empty:
-                    station_key = station_value.replace(' ', '_')
-                    
-                    # Check if modal is open
-                    if f'modal_{station_key}' in st.session_state:
-                        # Modal view - Back button for ALL stations
-                        col_back, col_space = st.columns([2, 10])
-                        with col_back:
-                            if st.button("← Back to Assets", key=f"back_{station_key}_{st.session_state.get(f'modal_{station_key}', 'default')}", type="primary"):
-                                del st.session_state[f'modal_{station_key}']
-                                del st.session_state[f'modal_data_{station_key}']
-                                st.rerun()
-                        
-                        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
-                        
-                        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
-                        
-                        for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
-                            asset_number = row.get(df.columns[0], 'N/A')
-                            
-                            with st.expander(asset_number):
-                                col1, col2, col3 = st.columns(3)
-                                
-                                with col1:
-                                    st.markdown("**Type**")
-                                    st.write(row.get(df.columns[2], "N/A"))
-                                    st.markdown("**Quantity**")
-                                    st.write(row.get(df.columns[4], "N/A"))
-                                    
-                                with col2:
-                                    st.markdown("**Dimensions**")
-                                    dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
-                                    st.write(dims)
-                                    st.markdown("**Voltage**")
-                                    st.write(row.get(df.columns[9], "N/A"))
-                                    
-                                with col3:
-                                    st.markdown("**Power**")
-                                    st.write(row.get(df.columns[10], "N/A"))
-                                    st.markdown("**Status**")
-                                    st.write(row.get(df.columns[11], "N/A"))
-                    else:
-                        # Card grid view with Type tabs and Asset Name filter
-                        type_col = df.columns[2]  # Type column
-                        
-                        # Create tabs for type filtering
-                        type_options = ['Tools', 'Equipment']
-                        type_tabs = st.tabs(type_options)
-                        
-                        for type_tab, type_option in zip(type_tabs, type_options):
-                            with type_tab:
-                                # Filter by type
-                                filtered = station_df.copy()
-                                
-                                if type_option != 'All':
-                                    filtered = filtered[filtered[type_col].str.contains(type_option, case=False, na=False)]
-                                
-                                # Asset name filter dropdown
-                                asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
-                                selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}_{type_option}")
-                                
-                                # Apply asset name filter on already type-filtered data
-                                if selected_asset != 'All':
-                                    filtered = filtered[filtered[asset_name_col] == selected_asset]
-                                
-                                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
-                                
-                                if not filtered.empty:
-                                    grouped = filtered.groupby(asset_name_col)
-                                    asset_groups = list(grouped)
-                                    
-                                    num_cols = 4
-                                    for i in range(0, len(asset_groups), num_cols):
-                                        cols = st.columns(num_cols)
-                                        batch = asset_groups[i:i + num_cols]
-                                        
-                                        for col_idx, (asset_name, group_df) in enumerate(batch):
-                                            with cols[col_idx]:
-                                                count = len(group_df)
-                                                safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
-                                                
-                                                # All cards use dark/black color
-                                                card_color = 'card-dark'
-                                                
-                                                # Create clickable card with black header
-                                                st.markdown(f"""
-                                                <div class="asset-card {card_color}">
-                                                    <div class="asset-card-header">
-                                                        <div class="asset-name">{asset_name}</div>
-                                                    </div>
-                                                    <div class="asset-card-body">
-                                                        <div class="asset-count">{count} items</div>
-                                                        <div class="asset-footer">View Details →</div>
-                                                    </div>
-                                                </div>
-                                                """, unsafe_allow_html=True)
-                                                
-                                                # Button positioned over the card
-                                                st.markdown("""
-                                                <style>
-                                                .element-container:has(> .stButton) {
-                                                    position: relative;
-                                                    margin-top: -200px;
-                                                    margin-bottom: 110px;
-                                                    z-index: 10;
-                                                }
-                                                .element-container:has(> .stButton) button {
-                                                    width: 100%;
-                                                    height: 200px;
-                                                    opacity: 0;
-                                                    cursor: pointer;
-                                                    margin: 0;
-                                                    padding: 0;
-                                                    background: transparent !important;
-                                                    border: none !important;
-                                                }
-                                                </style>
-                                                """, unsafe_allow_html=True)
-                                                
-                                                if st.button(" ", key=f"{safe_name}_{asset_name}", use_container_width=True):
-                                                    st.session_state[f'modal_{station_key}'] = asset_name
-                                                    st.session_state[f'modal_data_{station_key}'] = group_df
-                                                    st.rerun()
-                                else:
-                                    st.info("No assets found")
+        # Fabrication Station
+        with tab2:
+            station_df = df[df[station_col] == 'Fabrication Station']
+            if not station_df.empty:
+                render_station_content(station_df, 'Fabrication_Station', df, asset_name_col, type_col)
+        
+        # Pastry Station
+        with tab3:
+            station_df = df[df[station_col] == 'Pastry Station']
+            if not station_df.empty:
+                render_station_content(station_df, 'Pastry_Station', df, asset_name_col, type_col)
+        
+        # Packing Station
+        with tab4:
+            station_df = df[df[station_col] == 'Packing Station']
+            if not station_df.empty:
+                render_station_content(station_df, 'Packing_Station', df, asset_name_col, type_col)
     else:
         st.error("No data loaded")
 else:
