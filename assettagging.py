@@ -344,17 +344,6 @@ if credentials:
         station_col = df.columns[1]
         asset_name_col = df.columns[3]
         
-        # Statistics
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Total Assets", len(df))
-        with col2:
-            working_count = len(df[df[df.columns[11]].str.contains("Working", case=False, na=False)])
-            st.metric("Working", working_count)
-        with col3:
-            not_working = len(df[df[df.columns[11]].str.contains("Not Working", case=False, na=False)])
-            st.metric("Not Working", not_working)
-        
         stations = {
             'Hot Station': 'Hot Station',
             'Fabrication Station': 'Fabrication Station',
