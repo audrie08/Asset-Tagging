@@ -58,6 +58,48 @@ st.markdown("""
         font-weight: 600;
     }
     
+    /* Metrics - White with Colored accents */
+    [data-testid="stMetric"] {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        border: 1px solid #e8e8e8;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+    [data-testid="stMetric"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+    [data-testid="stMetric"]:nth-child(1)::before {
+        background: linear-gradient(90deg, #FFD700, #FFC107);
+    }
+    [data-testid="stMetric"]:nth-child(2)::before {
+        background: linear-gradient(90deg, #9e9e9e, #757575);
+    }
+    [data-testid="stMetric"]:nth-child(3)::before {
+        background: linear-gradient(90deg, #4a4a4a, #2d2d2d);
+    }
+    [data-testid="stMetric"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    }
+    [data-testid="stMetricValue"] {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 13px;
+        font-weight: 500;
+        color: #666;
+    }
+    
     /* Input fields */
     .stTextInput > div > div > input {
         border-radius: 8px;
@@ -135,7 +177,6 @@ st.markdown("""
         transition: all 0.3s ease;
         min-height: 150px;
         margin-bottom: 1.5rem;
-        cursor: pointer;
     }
     
     .asset-card:hover {
@@ -153,8 +194,21 @@ st.markdown("""
         background: white;
     }
     
+    /* Color variations for cards */
+    .card-yellow .asset-card-header {
+        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+    }
+    
     .card-dark .asset-card-header {
         background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+    }
+    
+    .card-gray .asset-card-header {
+        background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+    }
+    
+    .card-amber .asset-card-header {
+        background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     }
     
     .asset-name {
@@ -200,24 +254,6 @@ st.markdown("""
     .modal-count {
         color: #999;
         font-weight: 400;
-    }
-    
-    /* Invisible button overlay for cards */
-    .element-container:has(> .stButton) {
-        position: relative;
-        margin-top: -200px;
-        margin-bottom: 110px;
-        z-index: 10;
-    }
-    .element-container:has(> .stButton) button {
-        width: 100%;
-        height: 200px;
-        opacity: 0;
-        cursor: pointer;
-        margin: 0 !important;
-        padding: 0;
-        background: transparent !important;
-        border: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -307,7 +343,6 @@ if credentials:
         
         station_col = df.columns[1]
         asset_name_col = df.columns[3]
-        type_col = df.columns[2]
         
         stations = {
             'Hot Station': 'Hot Station',
@@ -324,74 +359,49 @@ if credentials:
                 
                 if not station_df.empty:
                     station_key = station_value.replace(' ', '_')
-                    modal_key = f'modal_{station_key}'
-                    modal_data_key = f'modal_data_{station_key}'
                     
-                    # Check if modal is active
-                    if modal_key in st.session_state and st.session_state[modal_key] is not None:
-                        # MODAL VIEW - Show asset details
+                    # Check if modal is open
+                    if f'modal_{station_key}' in st.session_state:
+                        # Modal view
+                        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
-                        # Close modal callback
-                        def close_modal():
-                            if modal_key in st.session_state:
-                                del st.session_state[modal_key]
-                            if modal_data_key in st.session_state:
-                                del st.session_state[modal_data_key]
+                        if st.button("← Back", key=f"close_{station_key}"):
+                            del st.session_state[f'modal_{station_key}']
+                            del st.session_state[f'modal_data_{station_key}']
+                            st.rerun()
                         
-                        # Back button
-                        col1, col2, col3 = st.columns([1, 2, 1])
-                        with col1:
-                            st.button(
-                                "← Back to Assets",
-                                key=f"back_button_{station_key}",
-                                on_click=close_modal,
-                                use_container_width=True
-                            )
+                        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
-                        st.markdown("---")
-                        
-                        # Display modal header and data
-                        asset_name_display = st.session_state.get(modal_key, 'Asset')
-                        modal_data = st.session_state.get(modal_data_key, pd.DataFrame())
-                        
-                        if not modal_data.empty:
-                            st.markdown(f'<div class="modal-header">{asset_name_display} <span class="modal-count">({len(modal_data)} items)</span></div>', unsafe_allow_html=True)
+                        for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
+                            asset_number = row.get(df.columns[0], 'N/A')
                             
-                            st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
-                            
-                            # Display asset details in expanders
-                            for idx, row in modal_data.iterrows():
-                                asset_number = row.get(df.columns[0], 'N/A')
+                            with st.expander(asset_number):
+                                col1, col2, col3 = st.columns(3)
                                 
-                                with st.expander(asset_number, expanded=False):
-                                    col1, col2, col3 = st.columns(3)
+                                with col1:
+                                    st.markdown("**Type**")
+                                    st.write(row.get(df.columns[2], "N/A"))
+                                    st.markdown("**Quantity**")
+                                    st.write(row.get(df.columns[4], "N/A"))
                                     
-                                    with col1:
-                                        st.markdown("**Type**")
-                                        st.write(row.get(df.columns[2], "N/A"))
-                                        st.markdown("**Quantity**")
-                                        st.write(row.get(df.columns[4], "N/A"))
-                                        
-                                    with col2:
-                                        st.markdown("**Dimensions**")
-                                        dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
-                                        st.write(dims)
-                                        st.markdown("**Voltage**")
-                                        st.write(row.get(df.columns[9], "N/A"))
-                                        
-                                    with col3:
-                                        st.markdown("**Power**")
-                                        st.write(row.get(df.columns[10], "N/A"))
-                                        st.markdown("**Status**")
-                                        st.write(row.get(df.columns[11], "N/A"))
-                        else:
-                            st.warning("No data available for this asset")
-                            
+                                with col2:
+                                    st.markdown("**Dimensions**")
+                                    dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
+                                    st.write(dims)
+                                    st.markdown("**Voltage**")
+                                    st.write(row.get(df.columns[9], "N/A"))
+                                    
+                                with col3:
+                                    st.markdown("**Power**")
+                                    st.write(row.get(df.columns[10], "N/A"))
+                                    st.markdown("**Status**")
+                                    st.write(row.get(df.columns[11], "N/A"))
                     else:
-                        # CARD GRID VIEW - Show asset cards
+                        # Card grid view with Type tabs and Asset Name filter
+                        type_col = df.columns[2]  # Type column
                         
-                        # Type filtering tabs
-                        type_options = ['All', 'Tools', 'Equipment']
+                        # Create tabs for type filtering
+                        type_options = ['Tools', 'Equipment']
                         type_tabs = st.tabs(type_options)
                         
                         for type_tab, type_option in zip(type_tabs, type_options):
@@ -404,13 +414,9 @@ if credentials:
                                 
                                 # Asset name filter dropdown
                                 asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
-                                selected_asset = st.selectbox(
-                                    "Filter by Asset Name", 
-                                    options=asset_names, 
-                                    key=f"filter_{station_value}_{type_option}"
-                                )
+                                selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}_{type_option}")
                                 
-                                # Apply asset name filter
+                                # Apply asset name filter on already type-filtered data
                                 if selected_asset != 'All':
                                     filtered = filtered[filtered[asset_name_col] == selected_asset]
                                 
@@ -428,11 +434,14 @@ if credentials:
                                         for col_idx, (asset_name, group_df) in enumerate(batch):
                                             with cols[col_idx]:
                                                 count = len(group_df)
-                                                card_key = f"card_{station_key}_{type_option}_{i}_{col_idx}"
+                                                safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
                                                 
-                                                # Create card
+                                                # All cards use dark/black color
+                                                card_color = 'card-dark'
+                                                
+                                                # Create clickable card with black header
                                                 st.markdown(f"""
-                                                <div class="asset-card card-dark">
+                                                <div class="asset-card {card_color}">
                                                     <div class="asset-card-header">
                                                         <div class="asset-name">{asset_name}</div>
                                                     </div>
@@ -443,18 +452,32 @@ if credentials:
                                                 </div>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                # Card click handler
-                                                def open_modal():
-                                                    st.session_state[modal_key] = asset_name
-                                                    st.session_state[modal_data_key] = group_df.copy()
+                                                # Button positioned over the card
+                                                st.markdown("""
+                                                <style>
+                                                .element-container:has(> .stButton) {
+                                                    position: relative;
+                                                    margin-top: -200px;
+                                                    margin-bottom: 110px;
+                                                    z-index: 10;
+                                                }
+                                                .element-container:has(> .stButton) button {
+                                                    width: 100%;
+                                                    height: 200px;
+                                                    opacity: 0;
+                                                    cursor: pointer;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                }
+                                                </style>
+                                                """, unsafe_allow_html=True)
                                                 
-                                                # Invisible button overlay
-                                                st.button(
-                                                    " ", 
-                                                    key=card_key, 
-                                                    on_click=open_modal,
-                                                    use_container_width=True
-                                                )
+                                                if st.button(" ", key=f"{safe_name}_{asset_name}", use_container_width=True):
+                                                    st.session_state[f'modal_{station_key}'] = asset_name
+                                                    st.session_state[f'modal_data_{station_key}'] = group_df
+                                                    st.rerun()
                                 else:
                                     st.info("No assets found")
     else:
