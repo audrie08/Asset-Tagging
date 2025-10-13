@@ -1,52 +1,4 @@
-for col_idx, (asset_name, group_df) in enumerate(batch):
-                                            with cols[col_idx]:
-                                                count = len(group_df)
-                                                card_key = f"card_{station_key}_{type_option}_{i}_{col_idx}"
-                                                
-                                                # Create card
-                                                st.markdown(f"""
-                                                <div class="asset-card card-dark">
-                                                    <div class="asset-card-header">
-                                                        <div class="asset-name">{asset_name}</div>
-                                                    </div>
-                                                    <div class="asset-card-body">
-                                                        <div class="asset-count">{count} items</div>
-                                                        <div class="asset-footer">View Details →</div>
-                                                    </div>
-                                                </div>
-                                                """, unsafe_allow_html=True)
-                                                
-                                                # Invisible button overlay
-                                                st.markdown("""
-                                                <style>
-                                                .element-container:has(> .stButton) {
-                                                    position: relative;
-                                                    margin-top: -200px;
-                                                    margin-bottom: 110px;
-                                                    z-index: 10;
-                                                }
-                                                .element-container:has(> .stButton) button {
-                                                    width: 100%;
-                                                    height: 200px;
-                                                    opacity: 0;
-                                                    cursor: pointer;
-                                                    margin: 0 !important;
-                                                    padding: 0;
-                                                    background: transparent !important;
-                                                    border: none !important;
-                                                }
-                                                </style>
-                                                """, unsafe_allow_html=True)
-                                                
-                                                # Card click handler with callback - use lambda with default args
-                                                st.button(
-                                                    " ", 
-                                                    key=card_key, 
-                                                    on_click=lambda n=asset_name, d=group_df: [
-                                                        st.session_state.__setitem__(modal_key, n),
-                                                        st.session_state.__setitem__(modal_data_key, d)
-                                                    ],
-                                                    use_container_width=import streamlit as st
+import streamlit as st
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
@@ -124,48 +76,6 @@ st.markdown("""
         color: #FFD700;
         background: #1a1a1a;
         font-weight: 600;
-    }
-    
-    /* Metrics - White with Colored accents */
-    [data-testid="stMetric"] {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 10px;
-        border: 1px solid #e8e8e8;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.2s ease;
-    }
-    [data-testid="stMetric"]::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-    }
-    [data-testid="stMetric"]:nth-child(1)::before {
-        background: linear-gradient(90deg, #FFD700, #FFC107);
-    }
-    [data-testid="stMetric"]:nth-child(2)::before {
-        background: linear-gradient(90deg, #9e9e9e, #757575);
-    }
-    [data-testid="stMetric"]:nth-child(3)::before {
-        background: linear-gradient(90deg, #4a4a4a, #2d2d2d);
-    }
-    [data-testid="stMetric"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-    }
-    [data-testid="stMetricValue"] {
-        font-size: 28px;
-        font-weight: 600;
-        color: #1a1a1a;
-    }
-    [data-testid="stMetricLabel"] {
-        font-size: 13px;
-        font-weight: 500;
-        color: #666;
     }
     
     /* Input fields */
@@ -262,21 +172,8 @@ st.markdown("""
         background: white;
     }
     
-    /* Color variations for cards */
-    .card-yellow .asset-card-header {
-        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
-    }
-    
     .card-dark .asset-card-header {
         background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
-    }
-    
-    .card-gray .asset-card-header {
-        background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
-    }
-    
-    .card-amber .asset-card-header {
-        background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     }
     
     .asset-name {
@@ -407,9 +304,6 @@ if DEBUG_MODE:
             st.json(modal_keys)
         else:
             st.info("No modal keys in session state")
-        
-        st.write("**Full Session State:**")
-        st.write(dict(st.session_state))
 
 credentials = load_credentials()
 
@@ -473,7 +367,7 @@ if credentials:
                         # BIG VISIBLE BACK BUTTON
                         st.markdown("""
                         <div style="background: red; padding: 20px; margin: 20px 0;">
-                            <h2 style="color: white; margin: 0;">BACK BUTTON SHOULD BE BELOW THIS</h2>
+                            <h2 style="color: white; margin: 0;">🔴 BACK BUTTON SHOULD BE BELOW THIS 🔴</h2>
                         </div>
                         """, unsafe_allow_html=True)
                         
@@ -490,7 +384,7 @@ if credentials:
                         col1, col2, col3 = st.columns([1, 1, 2])
                         with col1:
                             st.button(
-                                "🔙 BACK",
+                                "🔙 BACK TO ASSETS",
                                 key=f"back_button_{station_key}",
                                 type="primary",
                                 on_click=close_modal,
@@ -499,7 +393,7 @@ if credentials:
                         
                         st.markdown("""
                         <div style="background: green; padding: 20px; margin: 20px 0;">
-                            <h2 style="color: white; margin: 0;">BACK BUTTON SHOULD BE ABOVE THIS</h2>
+                            <h2 style="color: white; margin: 0;">🟢 BACK BUTTON SHOULD BE ABOVE THIS 🟢</h2>
                         </div>
                         """, unsafe_allow_html=True)
                         
@@ -628,11 +522,11 @@ if credentials:
                                                 """, unsafe_allow_html=True)
                                                 
                                                 # Card click handler with callback
-                                                def open_modal(name=asset_name, data=group_df):
-                                                    st.session_state[modal_key] = name
-                                                    st.session_state[modal_data_key] = data
+                                                def open_modal():
+                                                    st.session_state[modal_key] = asset_name
+                                                    st.session_state[modal_data_key] = group_df.copy()
                                                     if DEBUG_MODE:
-                                                        st.toast(f"✅ Opening modal: {name}")
+                                                        st.toast(f"✅ Opening modal: {asset_name}")
                                                 
                                                 st.button(
                                                     " ", 
