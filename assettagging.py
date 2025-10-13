@@ -453,10 +453,13 @@ def render_station_content(station_df, station_key, df, asset_name_col, type_col
 
 # Clear modal states when switching tabs
 def clear_modal_states():
-    for key in list(st.session_state.keys()):
-        if key.startswith("modal_"):
-            del st.session_state[key]
-        if key.startswith("modal_data_"):
+    keys_to_delete = []
+    for key in st.session_state.keys():
+        if key.startswith("modal_") or key.startswith("modal_data_"):
+            keys_to_delete.append(key)
+    
+    for key in keys_to_delete:
+        if key in st.session_state:
             del st.session_state[key]
 
 # Main App
