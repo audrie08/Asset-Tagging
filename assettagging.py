@@ -401,7 +401,7 @@ if credentials:
                         type_col = df.columns[2]  # Type column
                         
                         # Create tabs for type filtering
-                        type_options = ['All', 'Tools', 'Equipment']
+                        type_options = ['Tools', 'Equipment']
                         type_tabs = st.tabs(type_options)
                         
                         for type_tab, type_option in zip(type_tabs, type_options):
