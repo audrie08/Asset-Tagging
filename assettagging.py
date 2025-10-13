@@ -1,4 +1,52 @@
-import streamlit as st
+for col_idx, (asset_name, group_df) in enumerate(batch):
+                                            with cols[col_idx]:
+                                                count = len(group_df)
+                                                card_key = f"card_{station_key}_{type_option}_{i}_{col_idx}"
+                                                
+                                                # Create card
+                                                st.markdown(f"""
+                                                <div class="asset-card card-dark">
+                                                    <div class="asset-card-header">
+                                                        <div class="asset-name">{asset_name}</div>
+                                                    </div>
+                                                    <div class="asset-card-body">
+                                                        <div class="asset-count">{count} items</div>
+                                                        <div class="asset-footer">View Details →</div>
+                                                    </div>
+                                                </div>
+                                                """, unsafe_allow_html=True)
+                                                
+                                                # Invisible button overlay
+                                                st.markdown("""
+                                                <style>
+                                                .element-container:has(> .stButton) {
+                                                    position: relative;
+                                                    margin-top: -200px;
+                                                    margin-bottom: 110px;
+                                                    z-index: 10;
+                                                }
+                                                .element-container:has(> .stButton) button {
+                                                    width: 100%;
+                                                    height: 200px;
+                                                    opacity: 0;
+                                                    cursor: pointer;
+                                                    margin: 0 !important;
+                                                    padding: 0;
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                }
+                                                </style>
+                                                """, unsafe_allow_html=True)
+                                                
+                                                # Card click handler with callback - use lambda with default args
+                                                st.button(
+                                                    " ", 
+                                                    key=card_key, 
+                                                    on_click=lambda n=asset_name, d=group_df: [
+                                                        st.session_state.__setitem__(modal_key, n),
+                                                        st.session_state.__setitem__(modal_data_key, d)
+                                                    ],
+                                                    use_container_width=import streamlit as st
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
@@ -420,39 +468,46 @@ if credentials:
                         # MODAL VIEW - Asset Details
                         st.success("✅ MODAL VIEW MODE ACTIVE")
                         
-                        # Back button
-                        if DEBUG_MODE:
-                            st.warning("⚠️ Rendering BACK button now...")
+                        st.markdown("---")
                         
-                        back_clicked = st.button(
-                            "← Back to Asset List",
-                            key=f"back_button_{station_key}",
-                            type="primary",
-                            use_container_width=False
-                        )
+                        # BIG VISIBLE BACK BUTTON
+                        st.markdown("""
+                        <div style="background: red; padding: 20px; margin: 20px 0;">
+                            <h2 style="color: white; margin: 0;">BACK BUTTON SHOULD BE BELOW THIS</h2>
+                        </div>
+                        """, unsafe_allow_html=True)
                         
-                        if DEBUG_MODE:
-                            st.write(f"🖱️ Back Button Clicked: {back_clicked}")
-                        
-                        # Process back button click
-                        if back_clicked:
+                        # Define callback for back button
+                        def close_modal():
                             if DEBUG_MODE:
-                                st.error("🔴 BACK BUTTON WAS CLICKED! Deleting state...")
-                            
-                            # Delete the modal state
-                            keys_to_delete = []
+                                st.toast("🔴 CALLBACK: Closing modal...")
                             if modal_key in st.session_state:
-                                keys_to_delete.append(modal_key)
                                 del st.session_state[modal_key]
                             if modal_data_key in st.session_state:
-                                keys_to_delete.append(modal_data_key)
                                 del st.session_state[modal_data_key]
-                            
-                            if DEBUG_MODE:
-                                st.success(f"✅ Deleted keys: {keys_to_delete}")
-                                st.write("🔄 About to rerun...")
-                            
-                            st.rerun()
+                        
+                        # Back button with callback
+                        col1, col2, col3 = st.columns([1, 1, 2])
+                        with col1:
+                            st.button(
+                                "🔙 BACK",
+                                key=f"back_button_{station_key}",
+                                type="primary",
+                                on_click=close_modal,
+                                use_container_width=True
+                            )
+                        
+                        st.markdown("""
+                        <div style="background: green; padding: 20px; margin: 20px 0;">
+                            <h2 style="color: white; margin: 0;">BACK BUTTON SHOULD BE ABOVE THIS</h2>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        st.markdown("---")
+                        
+                        if DEBUG_MODE:
+                            st.write(f"🔍 Modal still exists: {modal_key in st.session_state}")
+                            st.write(f"🔍 Current modal value: {st.session_state.get(modal_key, 'DELETED')}")
                         
                         # Display modal header
                         asset_name_display = st.session_state.get(modal_key, 'Asset')
@@ -572,18 +627,19 @@ if credentials:
                                                 </style>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                # Card click handler
-                                                card_clicked = st.button(" ", key=card_key, use_container_width=True)
-                                                
-                                                if DEBUG_MODE and card_clicked:
-                                                    st.success(f"🖱️ Card clicked: {asset_name}")
-                                                
-                                                if card_clicked:
-                                                    st.session_state[modal_key] = asset_name
-                                                    st.session_state[modal_data_key] = group_df
+                                                # Card click handler with callback
+                                                def open_modal(name=asset_name, data=group_df):
+                                                    st.session_state[modal_key] = name
+                                                    st.session_state[modal_data_key] = data
                                                     if DEBUG_MODE:
-                                                        st.write(f"✅ Set modal state: {asset_name}")
-                                                    st.rerun()
+                                                        st.toast(f"✅ Opening modal: {name}")
+                                                
+                                                st.button(
+                                                    " ", 
+                                                    key=card_key, 
+                                                    on_click=open_modal,
+                                                    use_container_width=True
+                                                )
                                 else:
                                     st.info("No assets found")
     else:
