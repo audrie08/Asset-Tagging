@@ -12,7 +12,11 @@ st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .block-container {padding: 2rem 3rem;}
+    .block-container {
+        padding: 2rem 6rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
     [data-testid="column"] {padding: 0 8px;}
     
     /* Header styling */
