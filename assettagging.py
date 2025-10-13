@@ -391,7 +391,7 @@ if credentials:
                             asset_number = row.get(df.columns[0], 'N/A')
                             
                             with st.expander(asset_number):
-                                col1, col2, col3 = st.columns(3)
+                                col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
                                 
                                 with col1:
                                     st.markdown("**Type**")
@@ -411,6 +411,17 @@ if credentials:
                                     st.write(row.get(df.columns[10], "N/A"))
                                     st.markdown("**Status**")
                                     st.write(row.get(df.columns[11], "N/A"))
+                                
+                                with col4:
+                                    st.markdown("**Image**")
+                                    image_url = row.get(df.columns[8], "")  # Column J is index 8 (after dropping first column)
+                                    if image_url and image_url.strip() and image_url != "N/A":
+                                        try:
+                                            st.image(image_url, use_container_width=True)
+                                        except:
+                                            st.write("Image not available")
+                                    else:
+                                        st.write("No image")
                     else:
                         # Card grid view with Type tabs and Asset Name filter
                         type_col = df.columns[2]  # Type column
