@@ -8,9 +8,6 @@ import io
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="Asset Tagging", layout="wide")
 
-# DEBUG MODE - Set to True to see debug info
-DEBUG_MODE = True
-
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
@@ -29,23 +26,6 @@ st.markdown("""
         font-size: 14px;
         color: #666;
         margin-bottom: 2rem;
-    }
-    
-    /* Debug styling */
-    .debug-box {
-        background: #fff3cd;
-        border: 2px solid #ffc107;
-        border-radius: 8px;
-        padding: 12px;
-        margin: 10px 0;
-        font-family: monospace;
-        font-size: 12px;
-    }
-    
-    .debug-title {
-        font-weight: bold;
-        color: #856404;
-        margin-bottom: 5px;
     }
     
     /* Tabs - Gray background with Yellow active */
@@ -118,33 +98,6 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3) !important;
     }
     
-    /* Expander styling - Minimal with Yellow accent */
-    .streamlit-expanderHeader {
-        background: white !important;
-        border: 1px solid #e8e8e8 !important;
-        border-left: 3px solid #FFD700 !important;
-        border-radius: 8px !important;
-        padding: 14px 18px !important;
-        font-weight: 500 !important;
-        font-size: 14px !important;
-        margin-bottom: 12px !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    .streamlit-expanderHeader:hover {
-        border-color: #FFD700 !important;
-        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.15) !important;
-    }
-    [data-testid="stExpander"] {
-        border: none !important;
-    }
-    .streamlit-expanderContent {
-        background: #fafafa !important;
-        border: none !important;
-        border-radius: 0 0 8px 8px !important;
-        padding: 18px !important;
-    }
-    
     /* Card styling - Colorful with Yellow/Gray variations */
     .asset-card {
         background: white;
@@ -204,21 +157,6 @@ st.markdown("""
     
     .asset-card:hover .asset-footer {
         color: #FFD700;
-    }
-    
-    /* Modal header */
-    .modal-header {
-        font-size: 20px;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid #FFD700;
-    }
-    
-    .modal-count {
-        color: #999;
-        font-weight: 400;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -295,16 +233,6 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
 st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
-# DEBUG PANEL
-if DEBUG_MODE:
-    with st.expander("🐛 DEBUG PANEL - Session State", expanded=True):
-        st.write("**All Session State Keys:**")
-        modal_keys = {k: v for k, v in st.session_state.items() if 'modal' in k}
-        if modal_keys:
-            st.json(modal_keys)
-        else:
-            st.info("No modal keys in session state")
-
 credentials = load_credentials()
 
 if credentials:
@@ -318,6 +246,7 @@ if credentials:
         
         station_col = df.columns[1]
         asset_name_col = df.columns[3]
+        type_col = df.columns[2]
         
         stations = {
             'Hot Station': 'Hot Station',
@@ -333,209 +262,59 @@ if credentials:
                 station_df = df[df[station_col] == station_value]
                 
                 if not station_df.empty:
-                    station_key = station_value.replace(' ', '_')
+                    # Type filtering tabs
+                    type_options = ['All', 'Tools', 'Equipment']
+                    type_tabs = st.tabs(type_options)
                     
-                    # DEBUG: Show current station info
-                    if DEBUG_MODE:
-                        st.markdown(f"""
-                        <div class="debug-box">
-                            <div class="debug-title">📍 Current Station: {station_value}</div>
-                            Station Key: {station_key}<br>
-                            Modal Key: modal_{station_key}<br>
-                            Modal Exists: {f'modal_{station_key}' in st.session_state}<br>
-                            Modal Value: {st.session_state.get(f'modal_{station_key}', 'None')}
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    # Check if modal is open for this station
-                    modal_key = f'modal_{station_key}'
-                    modal_data_key = f'modal_data_{station_key}'
-                    
-                    modal_exists = modal_key in st.session_state
-                    modal_value = st.session_state.get(modal_key)
-                    modal_active = modal_exists and modal_value is not None
-                    
-                    if DEBUG_MODE:
-                        st.info(f"🔍 Modal Active Check: {modal_active} (exists: {modal_exists}, value: {modal_value})")
-                    
-                    if modal_active:
-                        # MODAL VIEW - Asset Details
-                        st.success("✅ MODAL VIEW MODE ACTIVE")
-                        
-                        st.markdown("---")
-                        
-                        # BIG VISIBLE BACK BUTTON
-                        st.markdown("""
-                        <div style="background: red; padding: 20px; margin: 20px 0;">
-                            <h2 style="color: white; margin: 0;">🔴 BACK BUTTON SHOULD BE BELOW THIS 🔴</h2>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        # Define callback for back button
-                        def close_modal():
-                            if DEBUG_MODE:
-                                st.toast("🔴 CALLBACK: Closing modal...")
-                            if modal_key in st.session_state:
-                                del st.session_state[modal_key]
-                            if modal_data_key in st.session_state:
-                                del st.session_state[modal_data_key]
-                        
-                        # Back button with callback
-                        col1, col2, col3 = st.columns([1, 1, 2])
-                        with col1:
-                            st.button(
-                                "🔙 BACK TO ASSETS",
-                                key=f"back_button_{station_key}",
-                                type="primary",
-                                on_click=close_modal,
-                                use_container_width=True
+                    for type_tab, type_option in zip(type_tabs, type_options):
+                        with type_tab:
+                            # Filter by type
+                            filtered = station_df.copy()
+                            
+                            if type_option != 'All':
+                                filtered = filtered[filtered[type_col].str.contains(type_option, case=False, na=False)]
+                            
+                            # Asset name filter dropdown
+                            asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
+                            selected_asset = st.selectbox(
+                                "Filter by Asset Name", 
+                                options=asset_names, 
+                                key=f"filter_{station_value}_{type_option}"
                             )
-                        
-                        st.markdown("""
-                        <div style="background: green; padding: 20px; margin: 20px 0;">
-                            <h2 style="color: white; margin: 0;">🟢 BACK BUTTON SHOULD BE ABOVE THIS 🟢</h2>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        st.markdown("---")
-                        
-                        if DEBUG_MODE:
-                            st.write(f"🔍 Modal still exists: {modal_key in st.session_state}")
-                            st.write(f"🔍 Current modal value: {st.session_state.get(modal_key, 'DELETED')}")
-                        
-                        # Display modal header
-                        asset_name_display = st.session_state.get(modal_key, 'Asset')
-                        modal_data = st.session_state.get(modal_data_key, pd.DataFrame())
-                        
-                        if not modal_data.empty:
-                            st.markdown(f'<div class="modal-header">{asset_name_display} <span class="modal-count">({len(modal_data)} items)</span></div>', unsafe_allow_html=True)
+                            
+                            # Apply asset name filter
+                            if selected_asset != 'All':
+                                filtered = filtered[filtered[asset_name_col] == selected_asset]
                             
                             st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                             
-                            # Display asset details in expanders
-                            for idx, row in modal_data.iterrows():
-                                asset_number = row.get(df.columns[0], 'N/A')
+                            if not filtered.empty:
+                                grouped = filtered.groupby(asset_name_col)
+                                asset_groups = list(grouped)
                                 
-                                with st.expander(asset_number, expanded=False):
-                                    col1, col2, col3 = st.columns(3)
+                                num_cols = 4
+                                for i in range(0, len(asset_groups), num_cols):
+                                    cols = st.columns(num_cols)
+                                    batch = asset_groups[i:i + num_cols]
                                     
-                                    with col1:
-                                        st.markdown("**Type**")
-                                        st.write(row.get(df.columns[2], "N/A"))
-                                        st.markdown("**Quantity**")
-                                        st.write(row.get(df.columns[4], "N/A"))
-                                        
-                                    with col2:
-                                        st.markdown("**Dimensions**")
-                                        dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
-                                        st.write(dims)
-                                        st.markdown("**Voltage**")
-                                        st.write(row.get(df.columns[9], "N/A"))
-                                        
-                                    with col3:
-                                        st.markdown("**Power**")
-                                        st.write(row.get(df.columns[10], "N/A"))
-                                        st.markdown("**Status**")
-                                        st.write(row.get(df.columns[11], "N/A"))
-                        else:
-                            st.error("⚠️ Modal data is empty!")
-                            
-                    else:
-                        # CARD GRID VIEW - Asset Cards
-                        st.info("📋 CARD GRID VIEW MODE ACTIVE")
-                        
-                        type_col = df.columns[2]
-                        
-                        # Type filtering tabs
-                        type_options = ['All', 'Tools', 'Equipment']
-                        type_tabs = st.tabs(type_options)
-                        
-                        for type_tab, type_option in zip(type_tabs, type_options):
-                            with type_tab:
-                                # Filter by type
-                                filtered = station_df.copy()
-                                
-                                if type_option != 'All':
-                                    filtered = filtered[filtered[type_col].str.contains(type_option, case=False, na=False)]
-                                
-                                # Asset name filter dropdown
-                                asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
-                                selected_asset = st.selectbox(
-                                    "Filter by Asset Name", 
-                                    options=asset_names, 
-                                    key=f"filter_{station_value}_{type_option}"
-                                )
-                                
-                                # Apply asset name filter
-                                if selected_asset != 'All':
-                                    filtered = filtered[filtered[asset_name_col] == selected_asset]
-                                
-                                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
-                                
-                                if not filtered.empty:
-                                    grouped = filtered.groupby(asset_name_col)
-                                    asset_groups = list(grouped)
-                                    
-                                    num_cols = 4
-                                    for i in range(0, len(asset_groups), num_cols):
-                                        cols = st.columns(num_cols)
-                                        batch = asset_groups[i:i + num_cols]
-                                        
-                                        for col_idx, (asset_name, group_df) in enumerate(batch):
-                                            with cols[col_idx]:
-                                                count = len(group_df)
-                                                card_key = f"card_{station_key}_{type_option}_{i}_{col_idx}"
-                                                
-                                                # Create card
-                                                st.markdown(f"""
-                                                <div class="asset-card card-dark">
-                                                    <div class="asset-card-header">
-                                                        <div class="asset-name">{asset_name}</div>
-                                                    </div>
-                                                    <div class="asset-card-body">
-                                                        <div class="asset-count">{count} items</div>
-                                                        <div class="asset-footer">View Details →</div>
-                                                    </div>
+                                    for col_idx, (asset_name, group_df) in enumerate(batch):
+                                        with cols[col_idx]:
+                                            count = len(group_df)
+                                            
+                                            # Create card
+                                            st.markdown(f"""
+                                            <div class="asset-card card-dark">
+                                                <div class="asset-card-header">
+                                                    <div class="asset-name">{asset_name}</div>
                                                 </div>
-                                                """, unsafe_allow_html=True)
-                                                
-                                                # Invisible button overlay
-                                                st.markdown("""
-                                                <style>
-                                                .element-container:has(> .stButton) {
-                                                    position: relative;
-                                                    margin-top: -200px;
-                                                    margin-bottom: 110px;
-                                                    z-index: 10;
-                                                }
-                                                .element-container:has(> .stButton) button {
-                                                    width: 100%;
-                                                    height: 200px;
-                                                    opacity: 0;
-                                                    cursor: pointer;
-                                                    margin: 0 !important;
-                                                    padding: 0;
-                                                    background: transparent !important;
-                                                    border: none !important;
-                                                }
-                                                </style>
-                                                """, unsafe_allow_html=True)
-                                                
-                                                # Card click handler with callback
-                                                def open_modal():
-                                                    st.session_state[modal_key] = asset_name
-                                                    st.session_state[modal_data_key] = group_df.copy()
-                                                    if DEBUG_MODE:
-                                                        st.toast(f"✅ Opening modal: {asset_name}")
-                                                
-                                                st.button(
-                                                    " ", 
-                                                    key=card_key, 
-                                                    on_click=open_modal,
-                                                    use_container_width=True
-                                                )
-                                else:
-                                    st.info("No assets found")
+                                                <div class="asset-card-body">
+                                                    <div class="asset-count">{count} items</div>
+                                                    <div class="asset-footer">View Details →</div>
+                                                </div>
+                                            </div>
+                                            """, unsafe_allow_html=True)
+                            else:
+                                st.info("No assets found")
     else:
         st.error("No data loaded")
 else:
