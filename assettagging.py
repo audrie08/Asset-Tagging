@@ -167,6 +167,97 @@ st.markdown("""
         padding: 18px !important;
     }
     
+    /* Modern Detail Card Styling */
+    .detail-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e8e8e8;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+    }
+    
+    .detail-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+    
+    .detail-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f5f5f5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-asset-number {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a1a1a;
+        flex: 1;
+    }
+    
+    .detail-badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        background: #FFD700;
+        color: #1a1a1a;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .detail-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .detail-value {
+        font-size: 15px;
+        font-weight: 500;
+        color: #1a1a1a;
+        line-height: 1.4;
+    }
+    
+    .detail-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e8e8e8, transparent);
+        margin: 1.5rem 0;
+    }
+    
+    .image-container {
+        background: #f8f8f8;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        border: 2px dashed #e0e0e0;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .image-placeholder {
+        color: #999;
+        font-size: 14px;
+    }
+    
     /* Card styling - Colorful with Yellow/Gray variations */
     .asset-card {
         background: white;
@@ -392,6 +483,12 @@ if credentials:
                             st.write("**All columns after dropping first column:**")
                             for idx, col in enumerate(df.columns):
                                 st.write(f"Index {idx}: {col}")
+                            
+                            st.write("\n**Sample Picture column data (first 5 rows):**")
+                            picture_col = df.columns[8]
+                            sample_data = st.session_state[f'modal_data_{station_key}'][picture_col].head()
+                            for i, val in enumerate(sample_data):
+                                st.write(f"Row {i}: '{val}' (length: {len(str(val))})")
                         
                         for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
                             asset_number = row.get(df.columns[0], 'N/A')
