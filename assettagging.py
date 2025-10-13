@@ -140,6 +140,21 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3) !important;
     }
     
+    /* Back button styling */
+    .back-button button {
+        background: #1a1a1a !important;
+        border: 2px solid #1a1a1a !important;
+        color: #FFD700 !important;
+        font-weight: 600 !important;
+        padding: 12px 24px !important;
+        margin-bottom: 1.5rem !important;
+    }
+    .back-button button:hover {
+        background: #2d2d2d !important;
+        border-color: #FFD700 !important;
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4) !important;
+    }
+    
     /* Expander styling - Minimal with Yellow accent */
     .streamlit-expanderHeader {
         background: white !important;
@@ -326,6 +341,26 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         st.error(f"Error loading sheet data: {e}")
         return pd.DataFrame()
 
+def clear_modal_state(station_key):
+    """Clear modal state for a specific station"""
+    modal_key = f'modal_{station_key}'
+    modal_data_key = f'modal_data_{station_key}'
+    
+    if modal_key in st.session_state:
+        del st.session_state[modal_key]
+    if modal_data_key in st.session_state:
+        del st.session_state[modal_data_key]
+
+def clear_all_modals():
+    """Clear all modal states"""
+    keys_to_delete = [key for key in st.session_state.keys() if key.startswith('modal_')]
+    for key in keys_to_delete:
+        del st.session_state[key]
+
+# Initialize active tab tracker
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = None
+
 # Main App
 st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
@@ -353,22 +388,30 @@ if credentials:
         
         tabs = st.tabs(list(stations.keys()))
         
-        for tab, (tab_name, station_value) in zip(tabs, stations.items()):
+        for tab_index, (tab, (tab_name, station_value)) in enumerate(zip(tabs, stations.items())):
             with tab:
+                # Detect tab change and clear modals
+                if st.session_state.active_tab != tab_index:
+                    clear_all_modals()
+                    st.session_state.active_tab = tab_index
+                
                 station_df = df[df[station_col] == station_value]
                 
                 if not station_df.empty:
                     station_key = station_value.replace(' ', '_')
                     
-                    # Check if modal is open
+                    # Check if modal is open for this station
                     if f'modal_{station_key}' in st.session_state:
-                        # Modal view
-                        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
+                        # Modal view with prominent back button
+                        st.markdown("""<div class="back-button"></div>""", unsafe_allow_html=True)
                         
-                        if st.button("← Back", key=f"close_{station_key}"):
-                            del st.session_state[f'modal_{station_key}']
-                            del st.session_state[f'modal_data_{station_key}']
-                            st.rerun()
+                        col_back, col_spacer = st.columns([1, 5])
+                        with col_back:
+                            if st.button("← Back to Asset List", key=f"back_btn_{station_key}", use_container_width=True):
+                                clear_modal_state(station_key)
+                                st.rerun()
+                        
+                        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
                         st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
