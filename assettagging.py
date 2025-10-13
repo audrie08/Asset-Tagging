@@ -336,17 +336,15 @@ def render_station_content(station_df, station_key, df, asset_name_col, type_col
     modal_key = f'modal_{station_key}'
     modal_data_key = f'modal_data_{station_key}'
     
-    # If a modal is open - check both keys exist
-    if modal_key in st.session_state and modal_data_key in st.session_state:
+    # If a modal is open
+    if modal_key in st.session_state:
         asset_name = st.session_state[modal_key]
         modal_df = st.session_state[modal_data_key]
         
         # Back Button
         if st.button("← Back to Asset List", key=f"back_{station_key}", use_container_width=False):
-            if modal_key in st.session_state:
-                del st.session_state[modal_key]
-            if modal_data_key in st.session_state:
-                del st.session_state[modal_data_key]
+            del st.session_state[modal_key]
+            del st.session_state[modal_data_key]
             st.rerun()
         
         st.markdown(f'<div class="modal-header">{asset_name} <span class="modal-count">({len(modal_df)} items)</span></div>', unsafe_allow_html=True)
@@ -453,13 +451,10 @@ def render_station_content(station_df, station_key, df, asset_name_col, type_col
 
 # Clear modal states when switching tabs
 def clear_modal_states():
-    keys_to_delete = []
-    for key in st.session_state.keys():
-        if key.startswith("modal_") or key.startswith("modal_data_"):
-            keys_to_delete.append(key)
-    
-    for key in keys_to_delete:
-        if key in st.session_state:
+    for key in list(st.session_state.keys()):
+        if key.startswith("modal_"):
+            del st.session_state[key]
+        if key.startswith("modal_data_"):
             del st.session_state[key]
 
 # Main App
@@ -484,14 +479,17 @@ if credentials:
         # Create tabs for each station
         tab1, tab2, tab3, tab4 = st.tabs(['Hot Station', 'Fabrication Station', 'Pastry Station', 'Packing Station'])
         
-        # Track current tab
+        # Clear modal states when switching tabs
         if 'current_tab' not in st.session_state:
             st.session_state.current_tab = 'Hot Station'
         
         # Hot Station
         with tab1:
             if st.session_state.current_tab != 'Hot Station':
-                clear_modal_states()
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
                 st.session_state.current_tab = 'Hot Station'
             
             station_df = df[df[station_col] == 'Hot Station']
@@ -501,7 +499,10 @@ if credentials:
         # Fabrication Station
         with tab2:
             if st.session_state.current_tab != 'Fabrication Station':
-                clear_modal_states()
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
                 st.session_state.current_tab = 'Fabrication Station'
             
             station_df = df[df[station_col] == 'Fabrication Station']
@@ -511,7 +512,10 @@ if credentials:
         # Pastry Station
         with tab3:
             if st.session_state.current_tab != 'Pastry Station':
-                clear_modal_states()
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
                 st.session_state.current_tab = 'Pastry Station'
             
             station_df = df[df[station_col] == 'Pastry Station']
@@ -521,7 +525,10 @@ if credentials:
         # Packing Station
         with tab4:
             if st.session_state.current_tab != 'Packing Station':
-                clear_modal_states()
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
                 st.session_state.current_tab = 'Packing Station'
             
             station_df = df[df[station_col] == 'Packing Station']
