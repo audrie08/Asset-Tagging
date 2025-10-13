@@ -331,16 +331,10 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 def render_station_content(station_df, station_key, df, asset_name_col, type_col):
-    """Render content for each station with back button"""
+    """Render content for each station"""
     
-    # Check if modal is open - BACK BUTTON HERE
+    # Check if modal is open
     if f'modal_{station_key}' in st.session_state:
-        # Back button at the very top
-        if st.button("← Back to Assets", key=f"back_button_{station_key}"):
-            del st.session_state[f'modal_{station_key}']
-            del st.session_state[f'modal_data_{station_key}']
-            st.rerun()
-        
         st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
         
         st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
@@ -471,26 +465,58 @@ if credentials:
         # Create tabs for each station
         tab1, tab2, tab3, tab4 = st.tabs(['Hot Station', 'Fabrication Station', 'Pastry Station', 'Packing Station'])
         
+        # Clear modal states when switching tabs
+        if 'current_tab' not in st.session_state:
+            st.session_state.current_tab = 'Hot Station'
+        
         # Hot Station
         with tab1:
+            if st.session_state.current_tab != 'Hot Station':
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
+                st.session_state.current_tab = 'Hot Station'
+            
             station_df = df[df[station_col] == 'Hot Station']
             if not station_df.empty:
                 render_station_content(station_df, 'Hot_Station', df, asset_name_col, type_col)
         
         # Fabrication Station
         with tab2:
+            if st.session_state.current_tab != 'Fabrication Station':
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
+                st.session_state.current_tab = 'Fabrication Station'
+            
             station_df = df[df[station_col] == 'Fabrication Station']
             if not station_df.empty:
                 render_station_content(station_df, 'Fabrication_Station', df, asset_name_col, type_col)
         
         # Pastry Station
         with tab3:
+            if st.session_state.current_tab != 'Pastry Station':
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
+                st.session_state.current_tab = 'Pastry Station'
+            
             station_df = df[df[station_col] == 'Pastry Station']
             if not station_df.empty:
                 render_station_content(station_df, 'Pastry_Station', df, asset_name_col, type_col)
         
         # Packing Station
         with tab4:
+            if st.session_state.current_tab != 'Packing Station':
+                # Clear all modal states
+                for key in list(st.session_state.keys()):
+                    if key.startswith('modal_'):
+                        del st.session_state[key]
+                st.session_state.current_tab = 'Packing Station'
+            
             station_df = df[df[station_col] == 'Packing Station']
             if not station_df.empty:
                 render_station_content(station_df, 'Packing_Station', df, asset_name_col, type_col)
