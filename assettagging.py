@@ -6,7 +6,7 @@ import warnings
 import io
 
 warnings.filterwarnings('ignore')
-st.set_page_config(page_title="Asset Tagging", layout="centered")
+st.set_page_config(page_title="Asset Tagging", layout="wide")
 
 st.markdown("""
 <style>
@@ -367,12 +367,15 @@ if credentials:
                     # Check if modal is open
                     if f'modal_{station_key}' in st.session_state:
                         # Modal view
-                        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
+                        # Back button at the top
+                        col_back, col_spacer = st.columns([1, 5])
+                        with col_back:
+                            if st.button("← Back to Assets", key=f"close_{station_key}", use_container_width=True):
+                                del st.session_state[f'modal_{station_key}']
+                                del st.session_state[f'modal_data_{station_key}']
+                                st.rerun()
                         
-                        if st.button("← Back", key=f"close_{station_key}"):
-                            del st.session_state[f'modal_{station_key}']
-                            del st.session_state[f'modal_data_{station_key}']
-                            st.rerun()
+                        st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
                         st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
