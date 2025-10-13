@@ -336,15 +336,17 @@ def render_station_content(station_df, station_key, df, asset_name_col, type_col
     modal_key = f'modal_{station_key}'
     modal_data_key = f'modal_data_{station_key}'
     
-    # If a modal is open
-    if modal_key in st.session_state:
+    # If a modal is open - check both keys exist
+    if modal_key in st.session_state and modal_data_key in st.session_state:
         asset_name = st.session_state[modal_key]
         modal_df = st.session_state[modal_data_key]
         
         # Back Button
         if st.button("← Back to Asset List", key=f"back_{station_key}", use_container_width=False):
-            del st.session_state[modal_key]
-            del st.session_state[modal_data_key]
+            if modal_key in st.session_state:
+                del st.session_state[modal_key]
+            if modal_data_key in st.session_state:
+                del st.session_state[modal_data_key]
             st.rerun()
         
         st.markdown(f'<div class="modal-header">{asset_name} <span class="modal-count">({len(modal_df)} items)</span></div>', unsafe_allow_html=True)
