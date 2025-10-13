@@ -387,6 +387,12 @@ if credentials:
                         
                         st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
+                        # Debug: Show all column names with indices
+                        with st.expander("🔍 DEBUG - Column Mapping", expanded=False):
+                            st.write("**All columns after dropping first column:**")
+                            for idx, col in enumerate(df.columns):
+                                st.write(f"Index {idx}: {col}")
+                        
                         for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
                             asset_number = row.get(df.columns[0], 'N/A')
                             
@@ -414,12 +420,17 @@ if credentials:
                                 
                                 with col4:
                                     st.markdown("**Image**")
-                                    image_url = row.get(df.columns[8], "")  # Column J is index 8 (after dropping first column)
+                                    # Debug: Show column index and value
+                                    st.write(f"DEBUG - Column index 8: {df.columns[8]}")
+                                    image_url = row.get(df.columns[8], "")
+                                    st.write(f"DEBUG - Image URL: '{image_url}'")
+                                    st.write(f"DEBUG - URL length: {len(str(image_url))}")
+                                    
                                     if image_url and image_url.strip() and image_url != "N/A":
                                         try:
                                             st.image(image_url, use_container_width=True)
-                                        except:
-                                            st.write("Image not available")
+                                        except Exception as e:
+                                            st.write(f"Image load error: {str(e)}")
                                     else:
                                         st.write("No image")
                     else:
