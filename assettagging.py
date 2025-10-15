@@ -145,10 +145,10 @@ st.markdown("""
     }
     
     /* Back button specific styling */
-    div[data-testid="column"] > div > div.back-button-container {
+    .back-button-container {
         margin-bottom: 1.5rem;
     }
-    div[data-testid="column"] > div > div.back-button-container .stButton > button {
+    .back-button-container .stButton > button {
         background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
         border: none !important;
         color: white !important;
@@ -164,36 +164,18 @@ st.markdown("""
         height: auto !important;
         cursor: pointer !important;
     }
-    div[data-testid="column"] > div > div.back-button-container .stButton > button:hover {
+    .back-button-container .stButton > button:hover {
         background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%) !important;
         color: #1a1a1a !important;
         transform: translateX(-4px) !important;
         box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3) !important;
     }
     
-    /* Card overlay button styling */
-    .element-container:has(> div.invisible-button-overlay) {
-        position: relative !important;
-        margin-top: -200px !important;
-        margin-bottom: 110px !important;
-        z-index: 10 !important;
-    }
-    .invisible-button-overlay {
-        width: 100% !important;
-    }
-    .invisible-button-overlay .stButton {
-        width: 100% !important;
-    }
+    /* Override for invisible card buttons */
     .invisible-button-overlay .stButton > button {
+        opacity: 0 !important;
         width: 100% !important;
         height: 200px !important;
-        opacity: 0 !important;
-        cursor: pointer !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-        position: relative !important;
     }
     
     /* Expander styling - Minimal with Yellow accent */
@@ -601,8 +583,6 @@ if credentials:
                         # Modal view
                         st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
-                        st.write("🔴 BACK BUTTON SHOULD APPEAR BELOW THIS LINE 🔴")
-                        
                         # Back button with custom styling
                         st.markdown('<div class="back-button-container">', unsafe_allow_html=True)
                         if st.button("← Back to Assets", key=f"close_{station_key}"):
@@ -614,20 +594,6 @@ if credentials:
                             st.query_params.clear()
                             st.rerun()
                         st.markdown('</div>', unsafe_allow_html=True)
-                        
-                        st.write("🔴 BACK BUTTON SHOULD APPEAR ABOVE THIS LINE 🔴")
-                        
-                        # DEBUG INFO
-                        with st.expander(f"🐛 DEBUG - {station_key}", expanded=False):
-                            st.write(f"**Station Key:** {station_key}")
-                            st.write(f"**Query Params:** {dict(query_params)}")
-                            st.write(f"**Query station:** {query_params.get('station')}")
-                            st.write(f"**Query asset:** {query_params.get('asset')}")
-                            st.write(f"**Modal session state exists:** {f'modal_{station_key}' in st.session_state}")
-                            st.write(f"**Modal data session state exists:** {f'modal_data_{station_key}' in st.session_state}")
-                            if f'modal_{station_key}' in st.session_state:
-                                st.write(f"**Modal asset name:** {st.session_state[f'modal_{station_key}']}")
-                            st.write(f"**🔍 Show Modal Decision:** {show_modal}")
                         
                         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                         
@@ -793,7 +759,28 @@ if credentials:
                                                 </div>
                                                 """, unsafe_allow_html=True)
                                                 
-                                                # Button positioned over the card (invisible overlay)
+                                                # Button positioned over the card
+                                                st.markdown("""
+                                                <style>
+                                                .element-container:has(> .stButton) {
+                                                    position: relative;
+                                                    margin-top: -200px;
+                                                    margin-bottom: 110px;
+                                                    z-index: 10;
+                                                }
+                                                .element-container:has(> .stButton) button {
+                                                    width: 100%;
+                                                    height: 200px;
+                                                    opacity: 0;
+                                                    cursor: pointer;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                }
+                                                </style>
+                                                """, unsafe_allow_html=True)
+                                                
                                                 if st.button(" ", key=f"{safe_name}_{asset_name}", use_container_width=True):
                                                     st.session_state[f'modal_{station_key}'] = asset_name
                                                     st.session_state[f'modal_data_{station_key}'] = group_df
