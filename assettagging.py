@@ -12,7 +12,11 @@ st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .block-container {padding: 2rem 3rem;}
+    .block-container {
+        padding: 2rem 3rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
     [data-testid="column"] {padding: 0 8px;}
     
     /* Header styling */
@@ -478,18 +482,6 @@ if credentials:
                         
                         st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
                         
-                        # Debug: Show all column names with indices
-                        with st.expander("🔍 DEBUG - Column Mapping", expanded=False):
-                            st.write("**All columns after dropping first column:**")
-                            for idx, col in enumerate(df.columns):
-                                st.write(f"Index {idx}: {col}")
-                            
-                            st.write("\n**Sample Picture column data (first 5 rows):**")
-                            picture_col = df.columns[8]
-                            sample_data = st.session_state[f'modal_data_{station_key}'][picture_col].head()
-                            for i, val in enumerate(sample_data):
-                                st.write(f"Row {i}: '{val}' (length: {len(str(val))})")
-                        
                         for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
                             asset_number = row.get(df.columns[0], 'N/A')
                             
@@ -517,11 +509,7 @@ if credentials:
                                 
                                 with col4:
                                     st.markdown("**Image**")
-                                    # Debug: Show column index and value
-                                    st.write(f"DEBUG - Column index 8: {df.columns[8]}")
-                                    image_url = row.get(df.columns[8], "")
-                                    st.write(f"DEBUG - Image URL: '{image_url}'")
-                                    st.write(f"DEBUG - URL length: {len(str(image_url))}")
+                                    image_url = row.get(df.columns[12], "")
                                     
                                     if image_url and image_url.strip() and image_url != "N/A":
                                         try:
