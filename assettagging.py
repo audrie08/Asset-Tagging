@@ -550,6 +550,17 @@ if credentials:
                     # --- Handle query params for modal persistence ---
                     query_params = st.query_params
                     
+                    # DEBUG INFO
+                    with st.expander(f"🐛 DEBUG - {station_key}", expanded=True):
+                        st.write(f"**Station Key:** {station_key}")
+                        st.write(f"**Query Params:** {dict(query_params)}")
+                        st.write(f"**Query station:** {query_params.get('station')}")
+                        st.write(f"**Query asset:** {query_params.get('asset')}")
+                        st.write(f"**Modal session state exists:** {f'modal_{station_key}' in st.session_state}")
+                        st.write(f"**Modal data session state exists:** {f'modal_data_{station_key}' in st.session_state}")
+                        if f'modal_{station_key}' in st.session_state:
+                            st.write(f"**Modal asset name:** {st.session_state[f'modal_{station_key}']}")
+                    
                     # If query params exist and match this station, ensure session state is set
                     if query_params.get("station") == station_key and "asset" in query_params:
                         asset_name = query_params["asset"]
@@ -567,6 +578,8 @@ if credentials:
                             query_params.get("station") == station_key
                         )
                     )
+                    
+                    st.write(f"**🔍 Show Modal Decision:** {show_modal}")
                     
                     if show_modal:
                         # Modal view
