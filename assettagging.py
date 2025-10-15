@@ -550,18 +550,18 @@ if credentials:
                     # --- Handle query params for modal persistence ---
                     query_params = st.query_params
                     
-                    # If modal info is saved in query params, restore it into session_state
+                    # Only restore modal if the query params match THIS station
                     if f'modal_{station_key}' not in st.session_state:
                         if query_params.get("station") == station_key and "asset" in query_params:
                             asset_name = query_params["asset"]
-                            # Rebuild modal state from URL
+                            # Rebuild modal state from URL - but only for THIS station
                             filtered_data = df[(df[station_col] == station_value) & (df[asset_name_col] == asset_name)]
                             if not filtered_data.empty:
                                 st.session_state[f'modal_{station_key}'] = asset_name
                                 st.session_state[f'modal_data_{station_key}'] = filtered_data
                     
-                    # Check if modal is open
-                    if f'modal_{station_key}' in st.session_state:
+                    # Check if modal is open FOR THIS STATION
+                    if f'modal_{station_key}' in st.session_state and query_params.get("station") == station_key:
                         # Modal view
                         st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
