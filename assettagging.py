@@ -13,53 +13,64 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     .block-container {
-        padding: 2rem 3rem;
-        max-width: 1400px;
+        padding: 2.5rem 3rem;
+        max-width: 1600px;
         margin: 0 auto;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        min-height: 100vh;
     }
-    [data-testid="column"] {padding: 0 8px;}
+    [data-testid="column"] {padding: 0 10px;}
     
-    /* Header styling */
+    /* Header styling - Modern with gradient accent */
     .header-title {
-        font-size: 45px;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 0.25rem;
+        font-size: 42px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
     }
     .header-subtitle {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 2rem;
+        font-size: 16px;
+        color: #888;
+        margin-bottom: 2.5rem;
+        font-weight: 400;
     }
     
-    /* Tabs - Gray background with Yellow active */
+    /* Tabs - Modern elevated design with smooth animations */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem;
-        background: #f5f5f5;
-        padding: 0.5rem;
-        border-radius: 10px;
+        gap: 0.75rem;
+        background: white;
+        padding: 0.75rem;
+        border-radius: 16px;
         border: none;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
         justify-content: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
     .stTabs [data-baseweb="tab"] {
-        height: 48px;
-        padding: 0 20px;
+        height: 52px;
+        padding: 0 28px;
         font-weight: 500;
-        font-size: 14px;
+        font-size: 15px;
         color: #666;
         border: none;
         background: transparent;
-        border-radius: 8px;
+        border-radius: 10px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #1a1a1a;
-        background: #918e83;
+        background: #f5f5f5;
+        transform: translateY(-2px);
     }
     .stTabs [aria-selected="true"] {
-        color: #FFD700;
-        background: #1a1a1a;
+        color: #1a1a1a;
+        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
         font-weight: 600;
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
     }
     
     /* Metrics - White with Colored accents */
@@ -104,23 +115,37 @@ st.markdown("""
         color: #666;
     }
     
-    /* Input fields */
+    /* Input fields - Modern with subtle shadows */
     .stTextInput > div > div > input {
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        padding: 10px 14px;
-        font-size: 14px;
+        border-radius: 12px;
+        border: 2px solid #e8e8e8;
+        padding: 12px 16px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: white;
     }
     .stTextInput > div > div > input:focus {
         border-color: #FFD700;
-        box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
+        transform: translateY(-1px);
     }
     .stSelectbox > div > div {
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        border: 2px solid #e8e8e8;
+        transition: all 0.3s ease;
+        background: white;
     }
     .stSelectbox > div > div:hover {
         border-color: #FFD700;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    
+    /* Select box label */
+    .stSelectbox label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
     }
     
     /* Buttons - Yellow accent */
@@ -144,31 +169,34 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3) !important;
     }
     
-    /* Back button specific styling */
+    /* Back button - Premium gradient design */
     .back-button-container {
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
     .back-button-container .stButton > button {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+        background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 100%) !important;
         border: none !important;
         color: white !important;
-        padding: 12px 24px !important;
+        padding: 14px 28px !important;
         font-weight: 600 !important;
-        font-size: 14px !important;
+        font-size: 15px !important;
         margin-top: 0 !important;
         display: inline-flex !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 10px !important;
         opacity: 1 !important;
         width: auto !important;
         height: auto !important;
         cursor: pointer !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     .back-button-container .stButton > button:hover {
         background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%) !important;
         color: #1a1a1a !important;
-        transform: translateX(-4px) !important;
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3) !important;
+        transform: translateX(-6px) scale(1.02) !important;
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4) !important;
     }
     
     /* Override for invisible card buttons */
@@ -178,53 +206,64 @@ st.markdown("""
         height: 200px !important;
     }
     
-    /* Expander styling - Minimal with Yellow accent */
+    /* Expander styling - Ultra modern with premium feel */
     .streamlit-expanderHeader {
         background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%) !important;
-        border: 1px solid #e8e8e8 !important;
-        border-left: 4px solid #FFD700 !important;
-        border-radius: 12px !important;
-        padding: 16px 20px !important;
+        border: 2px solid #e8e8e8 !important;
+        border-left: 5px solid #FFD700 !important;
+        border-radius: 14px !important;
+        padding: 20px 24px !important;
         font-weight: 600 !important;
-        font-size: 15px !important;
-        margin-bottom: 16px !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+        font-size: 16px !important;
+        margin-bottom: 18px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
     }
     
     .streamlit-expanderHeader:hover {
         border-left-color: #FFC107 !important;
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15) !important;
-        transform: translateX(4px);
+        box-shadow: 0 6px 24px rgba(255, 215, 0, 0.2) !important;
+        transform: translateX(6px) scale(1.01);
+        background: linear-gradient(135deg, #ffffff 0%, #fffef8 100%) !important;
     }
     [data-testid="stExpander"] {
         border: none !important;
-        margin-bottom: 1rem !important;
+        margin-bottom: 1.25rem !important;
     }
     .streamlit-expanderContent {
         background: white !important;
-        border: 1px solid #e8e8e8 !important;
+        border: 2px solid #e8e8e8 !important;
         border-top: none !important;
-        border-radius: 0 0 12px 12px !important;
+        border-radius: 0 0 14px 14px !important;
         padding: 0 !important;
-        margin-top: -8px !important;
+        margin-top: -10px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
     }
     
-    /* Modern Info Grid Styling */
+    /* Modern Info Grid Styling - Premium card design */
     .info-section {
-        padding: 1.5rem;
-        background: #fafafa;
-        border-radius: 8px;
-        margin-bottom: 1rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03);
     }
     
     .info-row {
         display: grid;
-        grid-template-columns: 140px 1fr;
-        gap: 1rem;
-        padding: 0.75rem 0;
+        grid-template-columns: 160px 1fr;
+        gap: 1.5rem;
+        padding: 1rem 0;
         border-bottom: 1px solid #e8e8e8;
         align-items: start;
+        transition: all 0.2s ease;
+    }
+    
+    .info-row:hover {
+        background: rgba(255, 215, 0, 0.03);
+        padding-left: 0.5rem;
+        margin-left: -0.5rem;
+        border-radius: 8px;
     }
     
     .info-row:last-child {
@@ -232,31 +271,37 @@ st.markdown("""
     }
     
     .info-label {
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 700;
         color: #666;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding-top: 2px;
+        letter-spacing: 0.8px;
+        padding-top: 3px;
     }
     
     .info-value {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 500;
         color: #1a1a1a;
-        line-height: 1.5;
+        line-height: 1.6;
     }
     
     .image-section {
-        padding: 1.5rem;
+        padding: 2rem;
         background: white;
     }
     
     .image-wrapper {
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
-        border: 1px solid #e8e8e8;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border: 2px solid #e8e8e8;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .image-wrapper:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
     
     /* Modern Detail Card Styling */
@@ -350,78 +395,126 @@ st.markdown("""
         font-size: 14px;
     }
     
-    /* Card styling - Colorful with Yellow/Gray variations */
+    /* Card styling - Ultra modern with premium shadows */
     .asset-card {
         background: white;
-        border: 2px solid #999;
-        border-radius: 12px;
+        border: none;
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
-        min-height: 150px;
-        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 180px;
+        margin-bottom: 1.75rem;
+        position: relative;
+    }
+    
+    .asset-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.03) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
     }
     
     .asset-card:hover {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px) scale(1.02);
+    }
+    
+    .asset-card:hover::before {
+        opacity: 1;
     }
     
     .asset-card-header {
-        padding: 1rem 1.25rem;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 1.5rem 1.5rem;
+        border-bottom: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .asset-card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
     }
     
     .asset-card-body {
-        padding: 1.25rem;
+        padding: 1.5rem;
         background: white;
     }
     
-    /* Color variations for cards */
+    /* Color variations for cards - Enhanced gradients */
     .card-yellow .asset-card-header {
         background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+        box-shadow: inset 0 -2px 10px rgba(0, 0, 0, 0.1);
     }
     
     .card-dark .asset-card-header {
-        background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+        box-shadow: inset 0 -2px 10px rgba(0, 0, 0, 0.3);
     }
     
     .card-gray .asset-card-header {
-        background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+        background: linear-gradient(135deg, #757575 0%, #9e9e9e 100%);
+        box-shadow: inset 0 -2px 10px rgba(0, 0, 0, 0.2);
     }
     
     .card-amber .asset-card-header {
-        background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+        background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+        box-shadow: inset 0 -2px 10px rgba(0, 0, 0, 0.15);
     }
     
     .asset-name {
-        font-size: 18px;
-        font-weight: 600;
+        font-size: 19px;
+        font-weight: 700;
         color: white;
-        line-height: 1.3;
+        line-height: 1.4;
         margin: 0;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        letter-spacing: 0.3px;
     }
     
     .asset-count {
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 500;
-        color: #666;
-        line-height: 1.4;
-        margin-bottom: 1rem;
+        color: #888;
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
     }
     
     .asset-footer {
-        padding-top: 1rem;
-        border-top: 1px solid #f5f5f5;
-        font-size: 13px;
-        font-weight: 500;
+        padding-top: 1.25rem;
+        border-top: 2px solid #f5f5f5;
+        font-size: 14px;
+        font-weight: 600;
         color: #999;
-        transition: color 0.2s ease;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .asset-footer::after {
+        content: '→';
+        font-size: 16px;
+        transition: transform 0.3s ease;
     }
     
     .asset-card:hover .asset-footer {
         color: #FFD700;
+    }
+    
+    .asset-card:hover .asset-footer::after {
+        transform: translateX(4px);
     }
     
     /* Modal header */
@@ -525,7 +618,7 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 # Main App
-st.markdown('<div class="header-title">Commissary Assets</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
