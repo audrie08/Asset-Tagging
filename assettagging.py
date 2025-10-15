@@ -21,7 +21,7 @@ st.markdown("""
     
     /* Header styling */
     .header-title {
-        font-size: 50px;
+        font-size: 28px;
         font-weight: 600;
         color: #1a1a1a;
         margin-bottom: 0.25rem;
@@ -46,7 +46,7 @@ st.markdown("""
         height: 48px;
         padding: 0 20px;
         font-weight: 500;
-        font-size: 16px;
+        font-size: 14px;
         color: #666;
         border: none;
         background: transparent;
@@ -144,6 +144,29 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3) !important;
     }
     
+    /* Back button specific styling */
+    .back-button-container {
+        margin-bottom: 1.5rem;
+    }
+    .back-button-container .stButton > button {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+        border: none !important;
+        color: white !important;
+        padding: 12px 24px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        margin-top: 0 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .back-button-container .stButton > button:hover {
+        background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%) !important;
+        color: #1a1a1a !important;
+        transform: translateX(-4px);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3) !important;
+    }
+    
     /* Expander styling - Minimal with Yellow accent */
     .streamlit-expanderHeader {
         background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%) !important;
@@ -152,7 +175,7 @@ st.markdown("""
         border-radius: 12px !important;
         padding: 16px 20px !important;
         font-weight: 600 !important;
-        font-size: 20px !important;
+        font-size: 15px !important;
         margin-bottom: 16px !important;
         transition: all 0.3s ease !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
@@ -198,7 +221,7 @@ st.markdown("""
     }
     
     .info-label {
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 600;
         color: #666;
         text-transform: uppercase;
@@ -207,7 +230,7 @@ st.markdown("""
     }
     
     .info-value {
-        font-size: 17px;
+        font-size: 14px;
         font-weight: 500;
         color: #1a1a1a;
         line-height: 1.5;
@@ -491,7 +514,7 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 # Main App
-st.markdown('<div class="header-title">Commissary Assets</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
@@ -542,14 +565,17 @@ if credentials:
                         # Modal view
                         st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
-                        if st.button("← Back", key=f"close_{station_key}"):
+                        # Back button with custom styling
+                        st.markdown('<div class="back-button-container">', unsafe_allow_html=True)
+                        if st.button("← Back to Assets", key=f"close_{station_key}"):
                             del st.session_state[f'modal_{station_key}']
                             del st.session_state[f'modal_data_{station_key}']
                             # Remove modal info from URL
                             st.query_params.clear()
                             st.rerun()
+                        st.markdown('</div>', unsafe_allow_html=True)
                         
-                        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+                        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                         
                         for idx, row in st.session_state[f'modal_data_{station_key}'].iterrows():
                             asset_number = row.get(df.columns[0], 'N/A')
