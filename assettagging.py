@@ -619,18 +619,19 @@ if credentials:
                                     
                                     image_url = row.get(df.columns[9], "")
                                     
-                                    # DEBUG INFO
-                                    with st.expander("🔍 Debug Info", expanded=False):
-                                        st.write(f"**Column Index:** {9}")
-                                        st.write(f"**Column Name:** {df.columns[9]}")
-                                        st.write(f"**Original URL:** `{image_url}`")
-                                        st.write(f"**URL Length:** {len(str(image_url))}")
-                                        st.write(f"**URL Type:** {type(image_url)}")
-                                        converted_url = convert_google_drive_url(image_url)
-                                        st.write(f"**Converted URL:** `{converted_url}`")
-                                        st.write(f"**Is Google Drive URL:** {'drive.google.com' in str(image_url)}")
-                                        st.markdown(f"**Test URL:** [Click to test]({converted_url})")
-                                        st.info("⚠️ If image doesn't load, the file may not be publicly shared. Go to Google Drive > Share > Change to 'Anyone with the link' > Viewer permission")
+                                    # Check if the cell is empty but look at previous rows for merged cell value
+                                    if not image_url or str(image_url).strip() == "":
+                                        # Look backwards through the dataframe to find the image URL
+                                        current_asset_name = row.get(asset_name_col, "")
+                                        for prev_idx in range(idx - 1, -1, -1):
+                                            prev_row = st.session_state[f'modal_data_{station_key}'].iloc[prev_idx - st.session_state[f'modal_data_{station_key}'].index[0]]
+                                            if prev_row.get(asset_name_col, "") == current_asset_name:
+                                                prev_image_url = prev_row.get(df.columns[9], "")
+                                                if prev_image_url and str(prev_image_url).strip() != "":
+                                                    image_url = prev_image_url
+                                                    break
+                                            else:
+                                                break
                                     
                                     converted_url = convert_google_drive_url(image_url)
                                     
