@@ -21,7 +21,7 @@ st.markdown("""
     
     /* Header styling */
     .header-title {
-        font-size: 28px;
+        font-size: 35px;
         font-weight: 600;
         color: #1a1a1a;
         margin-bottom: 0.25rem;
@@ -525,7 +525,7 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 # Main App
-st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">Commissary Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
