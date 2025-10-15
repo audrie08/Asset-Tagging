@@ -146,29 +146,83 @@ st.markdown("""
     
     /* Expander styling - Minimal with Yellow accent */
     .streamlit-expanderHeader {
-        background: white !important;
+        background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%) !important;
         border: 1px solid #e8e8e8 !important;
-        border-left: 3px solid #FFD700 !important;
-        border-radius: 8px !important;
-        padding: 14px 18px !important;
-        font-weight: 500 !important;
-        font-size: 14px !important;
-        margin-bottom: 12px !important;
-        transition: all 0.2s ease !important;
+        border-left: 4px solid #FFD700 !important;
+        border-radius: 12px !important;
+        padding: 16px 20px !important;
+        font-weight: 600 !important;
+        font-size: 15px !important;
+        margin-bottom: 16px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
     }
     
     .streamlit-expanderHeader:hover {
-        border-color: #FFD700 !important;
-        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.15) !important;
+        border-left-color: #FFC107 !important;
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15) !important;
+        transform: translateX(4px);
     }
     [data-testid="stExpander"] {
         border: none !important;
+        margin-bottom: 1rem !important;
     }
     .streamlit-expanderContent {
-        background: #fafafa !important;
-        border: none !important;
-        border-radius: 0 0 8px 8px !important;
-        padding: 18px !important;
+        background: white !important;
+        border: 1px solid #e8e8e8 !important;
+        border-top: none !important;
+        border-radius: 0 0 12px 12px !important;
+        padding: 0 !important;
+        margin-top: -8px !important;
+    }
+    
+    /* Modern Info Grid Styling */
+    .info-section {
+        padding: 1.5rem;
+        background: #fafafa;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .info-row {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e8e8e8;
+        align-items: start;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding-top: 2px;
+    }
+    
+    .info-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+        line-height: 1.5;
+    }
+    
+    .image-section {
+        padding: 1.5rem;
+        background: white;
+    }
+    
+    .image-wrapper {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e8e8e8;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
     
     /* Modern Detail Card Styling */
@@ -501,29 +555,68 @@ if credentials:
                             asset_number = row.get(df.columns[0], 'N/A')
                             
                             with st.expander(asset_number):
-                                col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+                                # Create two main columns: info (70%) and image (30%)
+                                info_col, image_col = st.columns([7, 3])
                                 
-                                with col1:
-                                    st.markdown("**Type**")
-                                    st.write(row.get(df.columns[2], "N/A"))
-                                    st.markdown("**Quantity**")
-                                    st.write(row.get(df.columns[4], "N/A"))
+                                with info_col:
+                                    st.markdown("""
+                                    <div class="info-section">
+                                    """, unsafe_allow_html=True)
                                     
-                                with col2:
-                                    st.markdown("**Dimensions**")
+                                    # Row 1: Type and Quantity
+                                    st.markdown(f"""
+                                    <div class="info-row">
+                                        <div class="info-label">Type</div>
+                                        <div class="info-value">{row.get(df.columns[2], "N/A")}</div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                    
+                                    st.markdown(f"""
+                                    <div class="info-row">
+                                        <div class="info-label">Quantity</div>
+                                        <div class="info-value">{row.get(df.columns[4], "N/A")}</div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                    
+                                    # Row 2: Dimensions
                                     dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
-                                    st.write(dims)
-                                    st.markdown("**Voltage**")
-                                    st.write(row.get(df.columns[10], "N/A"))
+                                    st.markdown(f"""
+                                    <div class="info-row">
+                                        <div class="info-label">Dimensions</div>
+                                        <div class="info-value">{dims}</div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
                                     
-                                with col3:
-                                    st.markdown("**Power**")
-                                    st.write(row.get(df.columns[11], "N/A"))
-                                    st.markdown("**Status**")
-                                    st.write(row.get(df.columns[12], "N/A"))
+                                    # Row 3: Voltage
+                                    st.markdown(f"""
+                                    <div class="info-row">
+                                        <div class="info-label">Voltage</div>
+                                        <div class="info-value">{row.get(df.columns[10], "N/A")}</div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                    
+                                    # Row 4: Power
+                                    st.markdown(f"""
+                                    <div class="info-row">
+                                        <div class="info-label">Power</div>
+                                        <div class="info-value">{row.get(df.columns[11], "N/A")}</div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                    
+                                    # Row 5: Status
+                                    st.markdown(f"""
+                                    <div class="info-row">
+                                        <div class="info-label">Status</div>
+                                        <div class="info-value">{row.get(df.columns[12], "N/A")}</div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                    
+                                    st.markdown("</div>", unsafe_allow_html=True)
                                 
-                                with col4:
-                                    st.markdown("**Image**")
+                                with image_col:
+                                    st.markdown('<div class="image-section">', unsafe_allow_html=True)
+                                    st.markdown('<div class="info-label" style="margin-bottom: 0.75rem;">IMAGE</div>', unsafe_allow_html=True)
+                                    
                                     image_url = row.get(df.columns[9], "")
                                     
                                     # DEBUG INFO
@@ -542,6 +635,7 @@ if credentials:
                                     converted_url = convert_google_drive_url(image_url)
                                     
                                     if converted_url:
+                                        st.markdown('<div class="image-wrapper">', unsafe_allow_html=True)
                                         try:
                                             st.image(converted_url, use_container_width=True)
                                         except Exception as e:
@@ -553,8 +647,11 @@ if credentials:
                                                 <a href='{image_url}' target='_blank' style='color: #FFD700; text-decoration: none; font-weight: 500;'>View Image in Google Drive →</a>
                                             </div>
                                             """, unsafe_allow_html=True)
+                                        st.markdown('</div>', unsafe_allow_html=True)
                                     else:
-                                        st.write("No image")
+                                        st.markdown('<div style="padding: 2rem; background: #f8f8f8; border-radius: 8px; text-align: center; color: #999;">No image available</div>', unsafe_allow_html=True)
+                                    
+                                    st.markdown('</div>', unsafe_allow_html=True)
                     else:
                         # Card grid view with Type tabs and Asset Name filter
                         type_col = df.columns[2]  # Type column
