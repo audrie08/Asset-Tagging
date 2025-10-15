@@ -568,16 +568,16 @@ if credentials:
                         if not filtered_data.empty:
                             st.session_state[f'modal_{station_key}'] = asset_name
                             st.session_state[f'modal_data_{station_key}'] = filtered_data
+                    # If query params exist but DON'T match this station, clear this station's modal
+                    elif "station" in query_params and query_params.get("station") != station_key:
+                        if f'modal_{station_key}' in st.session_state:
+                            del st.session_state[f'modal_{station_key}']
+                        if f'modal_data_{station_key}' in st.session_state:
+                            del st.session_state[f'modal_data_{station_key}']
                     
                     # Check if modal is open FOR THIS STATION
-                    # Only show modal if session state exists AND (no query params OR query params match this station)
-                    show_modal = (
-                        f'modal_{station_key}' in st.session_state and 
-                        (
-                            "station" not in query_params or 
-                            query_params.get("station") == station_key
-                        )
-                    )
+                    # Show modal if session state exists for this station
+                    show_modal = f'modal_{station_key}' in st.session_state
                     
                     st.write(f"**🔍 Show Modal Decision:** {show_modal}")
                     
