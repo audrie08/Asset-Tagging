@@ -716,4 +716,82 @@ if credentials:
                         type_options = ['Tools', 'Equipment']
                         type_tabs = st.tabs(type_options)
                         
-                        for type_tab, type_option in zip(type_tabs, type_options
+                        for type_tab, type_option in zip(type_tabs, type_options):
+                            with type_tab:
+                                # Filter by type
+                                filtered = station_df[station_df[type_col].str.contains(type_option, case=False, na=False)]
+                                
+                                # Asset name filter dropdown
+                                asset_names = ['All'] + sorted(filtered[asset_name_col].unique().tolist())
+                                selected_asset = st.selectbox("Filter by Asset Name", options=asset_names, key=f"filter_{station_value}_{type_option}")
+                                
+                                # Apply asset name filter on already type-filtered data
+                                if selected_asset != 'All':
+                                    filtered = filtered[filtered[asset_name_col] == selected_asset]
+                                
+                                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+                                
+                                if not filtered.empty:
+                                    grouped = filtered.groupby(asset_name_col)
+                                    asset_groups = list(grouped)
+                                    
+                                    num_cols = 4
+                                    for i in range(0, len(asset_groups), num_cols):
+                                        cols = st.columns(num_cols)
+                                        batch = asset_groups[i:i + num_cols]
+                                        
+                                        for col_idx, (asset_name, group_df) in enumerate(batch):
+                                            with cols[col_idx]:
+                                                count = len(group_df)
+                                                safe_name = f"{station_key}_{type_option}_{i}_{col_idx}"
+                                                
+                                                # All cards use dark/black color
+                                                card_color = 'card-dark'
+                                                
+                                                # Create clickable card with black header
+                                                st.markdown(f"""
+                                                <div class="asset-card {card_color}">
+                                                    <div class="asset-card-header">
+                                                        <div class="asset-name">{asset_name}</div>
+                                                    </div>
+                                                    <div class="asset-card-body">
+                                                        <div class="asset-count">{count} items</div>
+                                                        <div class="asset-footer">View Details →</div>
+                                                    </div>
+                                                </div>
+                                                """, unsafe_allow_html=True)
+                                                
+                                                # Button positioned over the card
+                                                st.markdown("""
+                                                <style>
+                                                .element-container:has(> .stButton) {
+                                                    position: relative;
+                                                    margin-top: -200px;
+                                                    margin-bottom: 110px;
+                                                    z-index: 10;
+                                                }
+                                                .element-container:has(> .stButton) button {
+                                                    width: 100%;
+                                                    height: 200px;
+                                                    opacity: 0;
+                                                    cursor: pointer;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                    background: transparent !important;
+                                                    border: none !important;
+                                                }
+                                                </style>
+                                                """, unsafe_allow_html=True)
+                                                
+                                                if st.button(" ", key=f"{safe_name}_{asset_name}", use_container_width=True):
+                                                    st.session_state[f'modal_{station_key}'] = asset_name
+                                                    st.session_state[f'modal_data_{station_key}'] = group_df
+                                                    st.query_params["station"] = station_key
+                                                    st.query_params["asset"] = asset_name
+                                                    st.rerun()
+                                else:
+                                    st.info("No assets found")
+    else:
+        st.error("No data loaded")
+else:
+    st.error("Failed to load credentials")
