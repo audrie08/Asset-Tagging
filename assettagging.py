@@ -778,21 +778,21 @@ if credentials:
                                                 # Button positioned over the card
                                                 st.markdown("""
                                                 <style>
-                                                .invisible-button-overlay .stButton > button {
-                                                    width: 100%;
-                                                    height: 200px;
-                                                    opacity: 0;
-                                                    cursor: pointer;
-                                                    margin: 0;
-                                                    padding: 0;
-                                                    background: transparent !important;
-                                                    border: none !important;
-                                                }
-                                                .invisible-button-overlay {
+                                                .element-container:has(> div.invisible-button-overlay) {
                                                     position: relative;
                                                     margin-top: -200px;
                                                     margin-bottom: 110px;
                                                     z-index: 10;
+                                                }
+                                                .invisible-button-overlay .stButton > button {
+                                                    width: 100% !important;
+                                                    height: 200px !important;
+                                                    opacity: 0 !important;
+                                                    cursor: pointer !important;
+                                                    margin: 0 !important;
+                                                    padding: 0 !important;
+                                                    background: transparent !important;
+                                                    border: none !important;
                                                 }
                                                 </style>
                                                 """, unsafe_allow_html=True)
