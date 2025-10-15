@@ -156,15 +156,26 @@ st.markdown("""
         font-weight: 600 !important;
         font-size: 14px !important;
         margin-top: 0 !important;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        opacity: 1 !important;
+        width: auto !important;
+        height: auto !important;
+        cursor: pointer !important;
     }
     .back-button-container .stButton > button:hover {
         background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%) !important;
         color: #1a1a1a !important;
-        transform: translateX(-4px);
+        transform: translateX(-4px) !important;
         box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3) !important;
+    }
+    
+    /* Override for invisible card buttons */
+    .invisible-button-overlay .stButton > button {
+        opacity: 0 !important;
+        width: 100% !important;
+        height: 200px !important;
     }
     
     /* Expander styling - Minimal with Yellow accent */
@@ -550,17 +561,6 @@ if credentials:
                     # --- Handle query params for modal persistence ---
                     query_params = st.query_params
                     
-                    # DEBUG INFO
-                    with st.expander(f"🐛 DEBUG - {station_key}", expanded=True):
-                        st.write(f"**Station Key:** {station_key}")
-                        st.write(f"**Query Params:** {dict(query_params)}")
-                        st.write(f"**Query station:** {query_params.get('station')}")
-                        st.write(f"**Query asset:** {query_params.get('asset')}")
-                        st.write(f"**Modal session state exists:** {f'modal_{station_key}' in st.session_state}")
-                        st.write(f"**Modal data session state exists:** {f'modal_data_{station_key}' in st.session_state}")
-                        if f'modal_{station_key}' in st.session_state:
-                            st.write(f"**Modal asset name:** {st.session_state[f'modal_{station_key}']}")
-                    
                     # If query params exist and match this station, ensure session state is set
                     if query_params.get("station") == station_key and "asset" in query_params:
                         asset_name = query_params["asset"]
@@ -578,8 +578,6 @@ if credentials:
                     # Check if modal is open FOR THIS STATION
                     # Show modal if session state exists for this station
                     show_modal = f'modal_{station_key}' in st.session_state
-                    
-                    st.write(f"**🔍 Show Modal Decision:** {show_modal}")
                     
                     if show_modal:
                         # Modal view
@@ -600,6 +598,18 @@ if credentials:
                         st.markdown('</div>', unsafe_allow_html=True)
                         
                         st.write("🔴 BACK BUTTON SHOULD APPEAR ABOVE THIS LINE 🔴")
+                        
+                        # DEBUG INFO
+                        with st.expander(f"🐛 DEBUG - {station_key}", expanded=False):
+                            st.write(f"**Station Key:** {station_key}")
+                            st.write(f"**Query Params:** {dict(query_params)}")
+                            st.write(f"**Query station:** {query_params.get('station')}")
+                            st.write(f"**Query asset:** {query_params.get('asset')}")
+                            st.write(f"**Modal session state exists:** {f'modal_{station_key}' in st.session_state}")
+                            st.write(f"**Modal data session state exists:** {f'modal_data_{station_key}' in st.session_state}")
+                            if f'modal_{station_key}' in st.session_state:
+                                st.write(f"**Modal asset name:** {st.session_state[f'modal_{station_key}']}")
+                            st.write(f"**🔍 Show Modal Decision:** {show_modal}")
                         
                         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                         
@@ -768,13 +778,7 @@ if credentials:
                                                 # Button positioned over the card
                                                 st.markdown("""
                                                 <style>
-                                                .element-container:has(> .stButton) {
-                                                    position: relative;
-                                                    margin-top: -200px;
-                                                    margin-bottom: 110px;
-                                                    z-index: 10;
-                                                }
-                                                .element-container:has(> .stButton) button {
+                                                .invisible-button-overlay .stButton > button {
                                                     width: 100%;
                                                     height: 200px;
                                                     opacity: 0;
@@ -784,15 +788,23 @@ if credentials:
                                                     background: transparent !important;
                                                     border: none !important;
                                                 }
+                                                .invisible-button-overlay {
+                                                    position: relative;
+                                                    margin-top: -200px;
+                                                    margin-bottom: 110px;
+                                                    z-index: 10;
+                                                }
                                                 </style>
                                                 """, unsafe_allow_html=True)
                                                 
+                                                st.markdown('<div class="invisible-button-overlay">', unsafe_allow_html=True)
                                                 if st.button(" ", key=f"{safe_name}_{asset_name}", use_container_width=True):
                                                     st.session_state[f'modal_{station_key}'] = asset_name
                                                     st.session_state[f'modal_data_{station_key}'] = group_df
                                                     st.query_params["station"] = station_key
                                                     st.query_params["asset"] = asset_name
                                                     st.rerun()
+                                                st.markdown('</div>', unsafe_allow_html=True)
                                 else:
                                     st.info("No assets found")
     else:
