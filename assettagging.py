@@ -499,17 +499,17 @@ if credentials:
                                     dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
                                     st.write(dims)
                                     st.markdown("**Voltage**")
-                                    st.write(row.get(df.columns[9], "N/A"))
+                                    st.write(row.get(df.columns[10], "N/A"))
                                     
                                 with col3:
                                     st.markdown("**Power**")
-                                    st.write(row.get(df.columns[10], "N/A"))
-                                    st.markdown("**Status**")
                                     st.write(row.get(df.columns[11], "N/A"))
+                                    st.markdown("**Status**")
+                                    st.write(row.get(df.columns[12], "N/A"))
                                 
                                 with col4:
                                     st.markdown("**Image**")
-                                    image_url = row.get(df.columns[12], "")
+                                    image_url = row.get(df.columns[9], "")
                                     
                                     if image_url and image_url.strip() and image_url != "N/A":
                                         try:
