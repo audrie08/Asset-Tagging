@@ -23,7 +23,7 @@ st.markdown("""
     
     /* Header styling - Modern with gradient accent */
     .header-title {
-        font-size: 42px;
+        font-size: 50px;
         font-weight: 700;
         background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
         -webkit-background-clip: text;
@@ -618,7 +618,7 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 # Main App
-st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">Commissary Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
