@@ -384,7 +384,8 @@ def convert_google_drive_url(url):
         # Extract file ID from the URL
         if "/file/d/" in url:
             file_id = url.split("/file/d/")[1].split("/")[0]
-            return f"https://drive.google.com/uc?export=view&id={file_id}"
+            # Use thumbnail URL which works better with Streamlit
+            return f"https://drive.google.com/thumbnail?id={file_id}&sz=w1000"
     
     return url
 
