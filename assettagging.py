@@ -555,8 +555,27 @@ if credentials:
                             asset_number = row.get(df.columns[0], 'N/A')
                             
                             with st.expander(asset_number):
+                                # Helper function to get value from merged cells
+                                def get_merged_value(column_index):
+                                    value = row.get(df.columns[column_index], "")
+                                    if not value or str(value).strip() == "":
+                                        # Look backwards through the dataframe to find the value
+                                        current_asset_name = row.get(asset_name_col, "")
+                                        for prev_idx in range(idx - 1, -1, -1):
+                                            try:
+                                                prev_row = st.session_state[f'modal_data_{station_key}'].iloc[prev_idx - st.session_state[f'modal_data_{station_key}'].index[0]]
+                                                if prev_row.get(asset_name_col, "") == current_asset_name:
+                                                    prev_value = prev_row.get(df.columns[column_index], "")
+                                                    if prev_value and str(prev_value).strip() != "":
+                                                        return prev_value
+                                                else:
+                                                    break
+                                            except:
+                                                break
+                                    return value if value else "N/A"
+                                
                                 # Create two main columns: info (70%) and image (30%)
-                                info_col, image_col = st.columns([7, 3])
+                                info_col, image_col = st.columns([8, 2])
                                 
                                 with info_col:
                                     st.markdown("""
@@ -567,19 +586,22 @@ if credentials:
                                     st.markdown(f"""
                                     <div class="info-row">
                                         <div class="info-label">Type</div>
-                                        <div class="info-value">{row.get(df.columns[2], "N/A")}</div>
+                                        <div class="info-value">{get_merged_value(2)}</div>
                                     </div>
                                     """, unsafe_allow_html=True)
                                     
                                     st.markdown(f"""
                                     <div class="info-row">
                                         <div class="info-label">Quantity</div>
-                                        <div class="info-value">{row.get(df.columns[4], "N/A")}</div>
+                                        <div class="info-value">{get_merged_value(4)}</div>
                                     </div>
                                     """, unsafe_allow_html=True)
                                     
                                     # Row 2: Dimensions
-                                    dims = f"{row.get(df.columns[5], 'N/A')} × {row.get(df.columns[6], 'N/A')} × {row.get(df.columns[7], 'N/A')} cm"
+                                    dim1 = get_merged_value(5)
+                                    dim2 = get_merged_value(6)
+                                    dim3 = get_merged_value(7)
+                                    dims = f"{dim1} × {dim2} × {dim3} cm"
                                     st.markdown(f"""
                                     <div class="info-row">
                                         <div class="info-label">Dimensions</div>
@@ -591,7 +613,7 @@ if credentials:
                                     st.markdown(f"""
                                     <div class="info-row">
                                         <div class="info-label">Voltage</div>
-                                        <div class="info-value">{row.get(df.columns[10], "N/A")}</div>
+                                        <div class="info-value">{get_merged_value(10)}</div>
                                     </div>
                                     """, unsafe_allow_html=True)
                                     
@@ -599,7 +621,7 @@ if credentials:
                                     st.markdown(f"""
                                     <div class="info-row">
                                         <div class="info-label">Power</div>
-                                        <div class="info-value">{row.get(df.columns[11], "N/A")}</div>
+                                        <div class="info-value">{get_merged_value(11)}</div>
                                     </div>
                                     """, unsafe_allow_html=True)
                                     
@@ -607,7 +629,7 @@ if credentials:
                                     st.markdown(f"""
                                     <div class="info-row">
                                         <div class="info-label">Status</div>
-                                        <div class="info-value">{row.get(df.columns[12], "N/A")}</div>
+                                        <div class="info-value">{get_merged_value(12)}</div>
                                     </div>
                                     """, unsafe_allow_html=True)
                                     
@@ -617,22 +639,7 @@ if credentials:
                                     st.markdown('<div class="image-section">', unsafe_allow_html=True)
                                     st.markdown('<div class="info-label" style="margin-bottom: 0.75rem;">IMAGE</div>', unsafe_allow_html=True)
                                     
-                                    image_url = row.get(df.columns[9], "")
-                                    
-                                    # Check if the cell is empty but look at previous rows for merged cell value
-                                    if not image_url or str(image_url).strip() == "":
-                                        # Look backwards through the dataframe to find the image URL
-                                        current_asset_name = row.get(asset_name_col, "")
-                                        for prev_idx in range(idx - 1, -1, -1):
-                                            prev_row = st.session_state[f'modal_data_{station_key}'].iloc[prev_idx - st.session_state[f'modal_data_{station_key}'].index[0]]
-                                            if prev_row.get(asset_name_col, "") == current_asset_name:
-                                                prev_image_url = prev_row.get(df.columns[9], "")
-                                                if prev_image_url and str(prev_image_url).strip() != "":
-                                                    image_url = prev_image_url
-                                                    break
-                                            else:
-                                                break
-                                    
+                                    image_url = get_merged_value(9)
                                     converted_url = convert_google_drive_url(image_url)
                                     
                                     if converted_url:
