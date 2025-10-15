@@ -374,6 +374,20 @@ def load_credentials():
         st.error(f"Error loading credentials: {e}")
         return None
 
+def convert_google_drive_url(url):
+    """Convert Google Drive sharing URL to direct image URL"""
+    if not url or url.strip() == "" or url == "N/A":
+        return None
+    
+    # Check if it's a Google Drive URL
+    if "drive.google.com" in url:
+        # Extract file ID from the URL
+        if "/file/d/" in url:
+            file_id = url.split("/file/d/")[1].split("/")[0]
+            return f"https://drive.google.com/uc?export=view&id={file_id}"
+    
+    return url
+
 @st.cache_data(ttl=300)
 def load_sheet_data(_credentials, sheet_url, sheet_index=0):
     try:
@@ -510,10 +524,11 @@ if credentials:
                                 with col4:
                                     st.markdown("**Image**")
                                     image_url = row.get(df.columns[9], "")
+                                    converted_url = convert_google_drive_url(image_url)
                                     
-                                    if image_url and image_url.strip() and image_url != "N/A":
+                                    if converted_url:
                                         try:
-                                            st.image(image_url, use_container_width=True)
+                                            st.image(converted_url, use_container_width=True)
                                         except Exception as e:
                                             st.write(f"Image load error: {str(e)}")
                                     else:
