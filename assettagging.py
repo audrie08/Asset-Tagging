@@ -585,6 +585,8 @@ if credentials:
                         # Modal view
                         st.markdown(f'<div class="modal-header">{st.session_state[f"modal_{station_key}"]} <span class="modal-count">({len(st.session_state[f"modal_data_{station_key}"])} items)</span></div>', unsafe_allow_html=True)
                         
+                        st.write("🔴 BACK BUTTON SHOULD APPEAR BELOW THIS LINE 🔴")
+                        
                         # Back button with custom styling
                         st.markdown('<div class="back-button-container">', unsafe_allow_html=True)
                         if st.button("← Back to Assets", key=f"close_{station_key}"):
@@ -596,6 +598,8 @@ if credentials:
                             st.query_params.clear()
                             st.rerun()
                         st.markdown('</div>', unsafe_allow_html=True)
+                        
+                        st.write("🔴 BACK BUTTON SHOULD APPEAR ABOVE THIS LINE 🔴")
                         
                         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                         
