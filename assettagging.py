@@ -21,7 +21,7 @@ st.markdown("""
     
     /* Header styling */
     .header-title {
-        font-size: 35px;
+        font-size: 45px;
         font-weight: 600;
         color: #1a1a1a;
         margin-bottom: 0.25rem;
