@@ -524,13 +524,31 @@ if credentials:
                                 with col4:
                                     st.markdown("**Image**")
                                     image_url = row.get(df.columns[9], "")
+                                    
+                                    # DEBUG INFO
+                                    with st.expander("🔍 Debug Info", expanded=False):
+                                        st.write(f"**Column Index:** {9}")
+                                        st.write(f"**Column Name:** {df.columns[9]}")
+                                        st.write(f"**Original URL:** `{image_url}`")
+                                        st.write(f"**URL Length:** {len(str(image_url))}")
+                                        st.write(f"**URL Type:** {type(image_url)}")
+                                        converted_url = convert_google_drive_url(image_url)
+                                        st.write(f"**Converted URL:** `{converted_url}`")
+                                        st.write(f"**Is Google Drive URL:** {'drive.google.com' in str(image_url)}")
+                                    
                                     converted_url = convert_google_drive_url(image_url)
                                     
                                     if converted_url:
                                         try:
                                             st.image(converted_url, use_container_width=True)
                                         except Exception as e:
-                                            st.write(f"Image load error: {str(e)}")
+                                            st.error(f"Image load error: {str(e)}")
+                                            st.markdown(f"""
+                                            <div style='padding: 1rem; background: #f8f8f8; border-radius: 8px; text-align: center;'>
+                                                <p style='color: #999; margin-bottom: 0.5rem;'>Unable to display image</p>
+                                                <a href='{image_url}' target='_blank' style='color: #FFD700; text-decoration: none; font-weight: 500;'>View Image in Google Drive →</a>
+                                            </div>
+                                            """, unsafe_allow_html=True)
                                     else:
                                         st.write("No image")
                     else:
