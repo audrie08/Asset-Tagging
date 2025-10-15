@@ -198,7 +198,7 @@ st.markdown("""
     }
     
     .info-label {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         color: #666;
         text-transform: uppercase;
@@ -207,7 +207,7 @@ st.markdown("""
     }
     
     .info-value {
-        font-size: 20px;
+        font-size: 17px;
         font-weight: 500;
         color: #1a1a1a;
         line-height: 1.5;
