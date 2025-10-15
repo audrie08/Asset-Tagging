@@ -21,7 +21,7 @@ st.markdown("""
     
     /* Header styling */
     .header-title {
-        font-size: 28px;
+        font-size: 50px;
         font-weight: 600;
         color: #1a1a1a;
         margin-bottom: 0.25rem;
@@ -46,7 +46,7 @@ st.markdown("""
         height: 48px;
         padding: 0 20px;
         font-weight: 500;
-        font-size: 14px;
+        font-size: 16px;
         color: #666;
         border: none;
         background: transparent;
@@ -152,7 +152,7 @@ st.markdown("""
         border-radius: 12px !important;
         padding: 16px 20px !important;
         font-weight: 600 !important;
-        font-size: 15px !important;
+        font-size: 20px !important;
         margin-bottom: 16px !important;
         transition: all 0.3s ease !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
@@ -198,7 +198,7 @@ st.markdown("""
     }
     
     .info-label {
-        font-size: 12px;
+        font-size: 15px;
         font-weight: 600;
         color: #666;
         text-transform: uppercase;
@@ -207,7 +207,7 @@ st.markdown("""
     }
     
     .info-value {
-        font-size: 14px;
+        font-size: 20px;
         font-weight: 500;
         color: #1a1a1a;
         line-height: 1.5;
@@ -491,7 +491,7 @@ def load_sheet_data(_credentials, sheet_url, sheet_index=0):
         return pd.DataFrame()
 
 # Main App
-st.markdown('<div class="header-title">Assets</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">Commissary Assets</div>', unsafe_allow_html=True)
 st.markdown('<div class="header-subtitle">List of assets in the commissary</div>', unsafe_allow_html=True)
 
 credentials = load_credentials()
