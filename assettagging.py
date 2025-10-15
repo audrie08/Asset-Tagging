@@ -535,6 +535,8 @@ if credentials:
                                         converted_url = convert_google_drive_url(image_url)
                                         st.write(f"**Converted URL:** `{converted_url}`")
                                         st.write(f"**Is Google Drive URL:** {'drive.google.com' in str(image_url)}")
+                                        st.markdown(f"**Test URL:** [Click to test]({converted_url})")
+                                        st.info("⚠️ If image doesn't load, the file may not be publicly shared. Go to Google Drive > Share > Change to 'Anyone with the link' > Viewer permission")
                                     
                                     converted_url = convert_google_drive_url(image_url)
                                     
@@ -544,8 +546,9 @@ if credentials:
                                         except Exception as e:
                                             st.error(f"Image load error: {str(e)}")
                                             st.markdown(f"""
-                                            <div style='padding: 1rem; background: #f8f8f8; border-radius: 8px; text-align: center;'>
-                                                <p style='color: #999; margin-bottom: 0.5rem;'>Unable to display image</p>
+                                            <div style='padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #FFD700;'>
+                                                <p style='color: #856404; margin-bottom: 0.5rem; font-weight: 500;'>⚠️ Image cannot be displayed</p>
+                                                <p style='color: #856404; font-size: 13px; margin-bottom: 0.5rem;'>Make sure the file is publicly shared in Google Drive</p>
                                                 <a href='{image_url}' target='_blank' style='color: #FFD700; text-decoration: none; font-weight: 500;'>View Image in Google Drive →</a>
                                             </div>
                                             """, unsafe_allow_html=True)
